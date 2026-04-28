@@ -491,10 +491,17 @@ function initGoogleAPIs() {
 }
 
 function openDriveFolderPicker() {
+  // Init APIs if not ready yet — scripts may still be loading
   if (typeof gapi === 'undefined' || typeof google === 'undefined') {
-    alert('Google API still loading. Please wait and try again.'); return;
+    document.getElementById('folderStatus').textContent = 'Loading Google API… please try again in a moment.';
+    setTimeout(openDriveFolderPicker, 2000); return;
   }
-  if (!pickerApiLoaded || !gapiInited) { initGoogleAPIs(); setTimeout(openDriveFolderPicker, 1500); return; }
+  if (!pickerApiLoaded || !gapiInited || !tokenClient) {
+    initGoogleAPIs();
+    document.getElementById('folderStatus').textContent = 'Initializing Drive connection…';
+    setTimeout(openDriveFolderPicker, 2000); return;
+  }
+  document.getElementById('folderStatus').textContent = '';
   pendingAction = 'folder';
   if (!driveAccessToken) { tokenClient.requestAccessToken({ prompt: 'select_account' }); return; }
   showFolderPicker();
