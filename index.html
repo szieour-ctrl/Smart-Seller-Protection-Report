@@ -7,31 +7,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --navy: #0f1f3d;
-    --navy-mid: #1a3260;
-    --navy-light: #243d6e;
-    --gold: #c8a84b;
-    --gold-light: #e8c96a;
-    --gold-pale: rgba(200,168,75,0.08);
-    --cream: #f7f3ec;
-    --cream-dark: #f0ebe1;
-    --text: #1a1a1a;
-    --text-muted: #5a5a5a;
-    --success: #2a7d4f;
-    --danger: #c0392b;
-    --border: #d4c9b0;
-    --white: #ffffff;
-    --shadow: 0 4px 24px rgba(15,31,61,0.10);
-    --shadow-lg: 0 12px 48px rgba(15,31,61,0.18);
-    --disclosure: #1a5276;
-    --disclosure-light: #d4e6f1;
-    --condition: #1e8449;
-    --condition-light: #d5f5e3;
+    --navy: #0f1f3d; --navy-mid: #1a3260; --navy-light: #243d6e;
+    --gold: #c8a84b; --gold-light: #e8c96a; --gold-pale: rgba(200,168,75,0.08);
+    --cream: #f7f3ec; --cream-dark: #f0ebe1; --text: #1a1a1a; --text-muted: #5a5a5a;
+    --success: #2a7d4f; --danger: #c0392b; --border: #d4c9b0; --white: #ffffff;
+    --shadow: 0 4px 24px rgba(15,31,61,0.10); --shadow-lg: 0 12px 48px rgba(15,31,61,0.18);
+    --disclosure: #1a5276; --disclosure-light: #d4e6f1;
+    --condition: #1e8449; --condition-light: #d5f5e3;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
-
-  /* ── HEADER ── */
   header { background: var(--navy); padding: 0; position: relative; overflow: hidden; }
   header::before { content: ''; position: absolute; top: -60px; right: -60px; width: 300px; height: 300px; border-radius: 50%; background: rgba(200,168,75,0.07); }
   header::after { content: ''; position: absolute; bottom: -40px; left: 8%; width: 200px; height: 200px; border-radius: 50%; background: rgba(200,168,75,0.04); }
@@ -41,16 +26,10 @@
   .header-title span { color: var(--gold); }
   .header-sub { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 6px; font-weight: 300; }
   .brokerage-line { margin-top: 16px; font-size: 12px; color: rgba(255,255,255,0.35); letter-spacing: 0.5px; }
-
-  /* ── MAIN ── */
   main { max-width: 900px; margin: 0 auto; padding: 36px 24px 60px; }
-
-  /* ── CARDS ── */
   .card { background: var(--white); border-radius: 12px; box-shadow: var(--shadow); padding: 32px; margin-bottom: 24px; border: 1px solid var(--border); }
   .card-title { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 700; color: var(--navy); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
   .step-num { width: 26px; height: 26px; background: var(--navy); color: var(--gold); border-radius: 50%; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; flex-shrink: 0; }
-
-  /* ── AGENT GRID ── */
   .agent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
   .agent-card { border: 2px solid var(--border); border-radius: 10px; padding: 14px 12px; cursor: pointer; text-align: center; transition: all 0.2s; background: var(--cream); }
   .agent-card:hover { border-color: var(--navy-mid); background: var(--white); }
@@ -61,8 +40,6 @@
   .agent-card.selected .agent-name { color: var(--white); }
   .agent-dre { font-size: 10px; color: var(--text-muted); margin-top: 3px; transition: color 0.2s; }
   .agent-card.selected .agent-dre { color: rgba(255,255,255,0.5); }
-
-  /* ── MODE SELECTOR ── */
   .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .mode-card { border: 2.5px solid var(--border); border-radius: 12px; padding: 24px 20px; cursor: pointer; transition: all 0.2s; background: var(--cream); position: relative; overflow: hidden; }
   .mode-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--border); transition: background 0.2s; }
@@ -82,15 +59,11 @@
   .mode-badge { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 2px 8px; border-radius: 10px; margin-bottom: 10px; }
   .badge-disclosure { background: var(--disclosure-light); color: var(--disclosure); }
   .badge-condition { background: var(--condition-light); color: var(--condition); }
-
-  /* ── FORM ── */
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .form-group { display: flex; flex-direction: column; gap: 6px; }
   label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); }
   input { font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--cream); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; }
   input:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(15,31,61,0.08); background: var(--white); }
-
-  /* ── DRIVE SECTION ── */
   .drive-section { border: 2px solid var(--border); border-radius: 12px; padding: 28px 24px; background: var(--cream); }
   .drive-section.mode-disclosure { border-color: rgba(26,82,118,0.3); background: rgba(26,82,118,0.03); }
   .drive-section.mode-condition { border-color: rgba(30,132,73,0.3); background: rgba(30,132,73,0.03); }
@@ -100,8 +73,6 @@
   .drive-btn:hover { border-color: var(--navy); box-shadow: 0 2px 8px rgba(15,31,61,0.10); }
   .drive-btn.disclosure-btn:hover { border-color: var(--disclosure); color: var(--disclosure); }
   .drive-btn.condition-btn:hover { border-color: var(--condition); color: var(--condition); }
-
-  /* ── FILE LIST ── */
   .file-list { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
   .file-item { display: flex; align-items: center; gap: 12px; background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; animation: fadeIn 0.2s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
@@ -117,20 +88,14 @@
   .file-remove { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 18px; padding: 2px 6px; border-radius: 4px; transition: color 0.15s; flex-shrink: 0; line-height: 1; }
   .file-remove:hover { color: var(--danger); }
   .files-summary { margin-top: 12px; font-size: 12px; color: var(--text-muted); font-style: italic; }
-
-  /* ── OR DIVIDER ── */
   .or-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; }
   .or-divider div { flex: 1; height: 1px; background: var(--border); }
   .or-divider span { font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; }
-
-  /* ── LOCAL UPLOAD ── */
   .drop-zone { border: 2px dashed var(--border); border-radius: 10px; padding: 28px 20px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--white); position: relative; }
   .drop-zone:hover { border-color: var(--navy); background: rgba(15,31,61,0.02); }
   .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
   .drop-zone-icon { font-size: 28px; margin-bottom: 8px; }
   .drop-zone-text { font-size: 13px; color: var(--text-muted); }
-
-  /* ── GENERATE BTN ── */
   .generate-btn { width: 100%; padding: 17px; background: var(--navy); color: var(--white); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s; }
   .generate-btn:hover:not(:disabled) { background: var(--navy-mid); box-shadow: var(--shadow-lg); transform: translateY(-1px); }
   .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
@@ -138,15 +103,11 @@
   .generate-btn.btn-disclosure:hover:not(:disabled) { background: #154360; }
   .generate-btn.btn-condition { background: var(--condition); }
   .generate-btn.btn-condition:hover:not(:disabled) { background: #186a3b; }
-
-  /* ── STATUS ── */
   .status-bar { display: none; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 8px; margin-top: 16px; font-size: 13px; font-weight: 500; }
   .status-bar.loading { display: flex; background: rgba(15,31,61,0.06); color: var(--navy); border: 1px solid rgba(15,31,61,0.12); }
   .status-bar.error { display: flex; background: #fdf0ee; color: var(--danger); border: 1px solid #f5c0bb; }
   .spinner { width: 18px; height: 18px; border: 2.5px solid rgba(15,31,61,0.15); border-top-color: var(--navy); border-radius: 50%; animation: spin 0.8s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── REPORT OUTPUT ── */
   #report-output { display: none; }
   .report-header-bar { background: var(--navy); color: var(--white); border-radius: 12px 12px 0 0; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
   .report-header-bar.disclosure-header { background: var(--disclosure); }
@@ -163,18 +124,13 @@
   .btn-green:hover { filter: brightness(1.1); }
   .report-body-wrap { background: var(--white); border: 1px solid var(--border); border-top: none; border-radius: 0 0 12px 12px; padding: 32px 36px; }
   .report-body { font-size: 14px; line-height: 1.8; color: var(--text); white-space: pre-wrap; font-family: 'DM Sans', sans-serif; }
-
   .pabbly-status { display: none; margin-top: 12px; padding: 12px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; }
   .pabbly-status.sending { display: flex; align-items: center; gap: 10px; background: #eef4ff; color: #2255aa; border: 1px solid #c0d4f5; }
   .pabbly-status.sent { display: flex; align-items: center; gap: 10px; background: #eef7f1; color: var(--success); border: 1px solid #b8dfc8; }
   .pabbly-status.failed { display: flex; align-items: center; gap: 10px; background: #fdf0ee; color: var(--danger); border: 1px solid #f5c0bb; }
-
   .new-report-btn { margin-top: 20px; background: transparent; border: 2px solid var(--navy); color: var(--navy); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; padding: 10px 24px; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
   .new-report-btn:hover { background: var(--navy); color: var(--white); }
-
-  /* ── HIDDEN STEPS ── */
   .step-hidden { display: none; }
-
   @media (max-width: 600px) {
     .mode-grid { grid-template-columns: 1fr; }
     .form-row { grid-template-columns: 1fr; }
@@ -182,13 +138,10 @@
     .report-body-wrap { padding: 20px; }
   }
 </style>
-
-<!-- Load Google APIs -->
 <script src="https://apis.google.com/js/api.js" async defer onload="onGapiLoad()"></script>
 <script src="https://accounts.google.com/gsi/client" async defer onload="onGsiLoad()"></script>
 </head>
 <body>
-
 <header>
   <div class="header-inner">
     <div class="header-badge">SZ Real Estate Group</div>
@@ -197,16 +150,11 @@
     <p class="brokerage-line">Broker: Samuel K. Zieour · DRE #01397303 · SZ Real Estate Group</p>
   </div>
 </header>
-
 <main>
-
-  <!-- STEP 1: AGENT -->
   <div class="card">
     <div class="card-title"><span class="step-num">1</span> Select Agent</div>
     <div class="agent-grid" id="agentGrid"></div>
   </div>
-
-  <!-- STEP 2: REPORT MODE -->
   <div class="card">
     <div class="card-title"><span class="step-num">2</span> Select Report Type</div>
     <div class="mode-grid">
@@ -226,8 +174,6 @@
       </div>
     </div>
   </div>
-
-  <!-- STEP 3: PROPERTY INFO (hidden until mode selected) -->
   <div class="card step-hidden" id="step3">
     <div class="card-title"><span class="step-num">3</span> Property & Seller</div>
     <div class="form-row">
@@ -241,12 +187,8 @@
       </div>
     </div>
   </div>
-
-  <!-- STEP 4: DOCUMENTS (hidden until mode selected) -->
   <div class="card step-hidden" id="step4">
     <div class="card-title"><span class="step-num">4</span> <span id="step4Title">Upload Documents</span></div>
-
-    <!-- Drive folder auto-read section -->
     <div class="drive-section" id="driveFolderSection">
       <div class="drive-section-title" id="driveSectionTitle">Browse Google Drive</div>
       <div class="drive-section-hint" id="driveSectionHint">Select your transaction folder and the tool will automatically read the relevant documents.</div>
@@ -263,34 +205,23 @@
       </button>
       <div id="folderStatus" style="margin-top:10px;font-size:12px;color:var(--text-muted);font-style:italic;"></div>
     </div>
-
-    <div class="or-divider">
-      <div></div><span>OR UPLOAD MANUALLY</span><div></div>
-    </div>
-
+    <div class="or-divider"><div></div><span>OR UPLOAD MANUALLY</span><div></div></div>
     <div class="drop-zone" id="dropZone">
       <input type="file" id="fileInput" multiple accept=".pdf,.docx,.doc,.txt" onchange="handleFiles(this.files)" />
       <div class="drop-zone-icon">📂</div>
       <div class="drop-zone-text">Drop files here or click to browse from your computer</div>
     </div>
-
     <div class="file-list" id="fileList"></div>
     <div class="files-summary" id="filesSummary"></div>
   </div>
-
-  <!-- STEP 5: GENERATE (hidden until mode selected) -->
   <div class="card step-hidden" id="step5">
     <div class="card-title"><span class="step-num">5</span> Generate Report</div>
-    <button class="generate-btn" id="generateBtn" onclick="generateReport()">
-      ✦ Generate Smart Seller Protection Report™
-    </button>
+    <button class="generate-btn" id="generateBtn" onclick="generateReport()">✦ Generate Smart Seller Protection Report™</button>
     <div class="status-bar" id="statusBar">
       <div class="spinner"></div>
       <span id="statusText">Reading documents…</span>
     </div>
   </div>
-
-  <!-- OUTPUT -->
   <div id="report-output">
     <div class="report-header-bar" id="reportHeaderBar">
       <h3>Smart Seller Protection <span>Report™</span></h3>
@@ -300,84 +231,38 @@
         <button class="action-btn btn-outline" onclick="printReport()">Print / PDF</button>
       </div>
     </div>
-    <div class="report-body-wrap">
-      <div class="report-body" id="reportBody"></div>
-    </div>
+    <div class="report-body-wrap"><div class="report-body" id="reportBody"></div></div>
     <div class="pabbly-status" id="pabblyStatus"></div>
     <button class="new-report-btn" onclick="resetForm()">← Start New Report</button>
   </div>
-
 </main>
-
 <script>
-// ─────────────────────────────────────────────
-// CONFIGURATION
-// ─────────────────────────────────────────────
-let ANTHROPIC_API_KEY = "";
 const GOOGLE_API_KEY   = "AIzaSyAZzMGptybfWqP_FS8df2t4qhVdO_VkoT0";
 const GOOGLE_CLIENT_ID = "96917389365-hclaoi15jmlq4uocga79p3dn2s17j6td.apps.googleusercontent.com";
 const DRIVE_SCOPE      = "https://www.googleapis.com/auth/drive.readonly";
-
 const PABBLY_DISCLOSURE = "/.netlify/functions/send-to-pabbly-disclosure";
 const PABBLY_CONDITION  = "/.netlify/functions/send-to-pabbly-condition";
-
-// Fetch Anthropic key from Netlify Function
-(async () => {
-  try {
-    const res  = await fetch("/.netlify/functions/config");
-    const data = await res.json();
-    ANTHROPIC_API_KEY = data.anthropicKey || data.openaiKey || "";
-  } catch(e) { console.error("Could not load config:", e); }
-})();
-
 const AGENTS = [
   { name: "Samuel K. Zieour", dre: "01397303", initials: "SZ" },
   { name: "John P. Klein",    dre: "00994179", initials: "JK" },
 ];
-
-let selectedAgent  = null;
-let selectedMode   = null;
-let uploadedFiles  = [];
-let selectedFolder = null;
-let generatedReport = "";
-
-// ─────────────────────────────────────────────
-// GOOGLE API INIT — driven by onload callbacks
-// ─────────────────────────────────────────────
-let pickerApiLoaded  = false;
-let gapiInited       = false;
-let tokenClient      = null;
-let driveAccessToken = null;
-let gapiReady        = false; // true once gapi.js onload fires
-let gsiReady         = false; // true once gsi/client onload fires
+let selectedAgent=null, selectedMode=null, uploadedFiles=[], selectedFolder=null, generatedReport="";
+let pickerApiLoaded=false, gapiInited=false, tokenClient=null, driveAccessToken=null, gapiReady=false, gsiReady=false;
 
 function onGapiLoad() {
   gapiReady = true;
   gapi.load('picker', () => { pickerApiLoaded = true; });
-  gapi.load('client', async () => {
-    await gapi.client.init({});
-    gapiInited = true;
-  });
+  gapi.load('client', async () => { await gapi.client.init({}); gapiInited = true; });
   maybeInitTokenClient();
 }
-
-function onGsiLoad() {
-  gsiReady = true;
-  maybeInitTokenClient();
-}
-
+function onGsiLoad() { gsiReady = true; maybeInitTokenClient(); }
 function maybeInitTokenClient() {
   if (!gapiReady || !gsiReady || tokenClient) return;
   tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: GOOGLE_CLIENT_ID,
-    scope: DRIVE_SCOPE,
+    client_id: GOOGLE_CLIENT_ID, scope: DRIVE_SCOPE,
     callback: (resp) => {
       const statusEl = document.getElementById('folderStatus');
-      if (resp.error) {
-        statusEl.textContent = '⚠️ Google sign-in failed. Please try again.';
-        console.error('OAuth error:', resp);
-        return;
-      }
+      if (resp.error) { statusEl.textContent = '⚠️ Google sign-in failed. Please try again.'; return; }
       driveAccessToken = resp.access_token;
       statusEl.textContent = '';
       showFolderPicker();
@@ -385,441 +270,198 @@ function maybeInitTokenClient() {
   });
 }
 
-// ─────────────────────────────────────────────
-// AGENT CARDS
-// ─────────────────────────────────────────────
 const grid = document.getElementById('agentGrid');
 AGENTS.forEach((agent, i) => {
   const card = document.createElement('div');
   card.className = 'agent-card';
-  card.innerHTML = `<div class="agent-initial">${agent.initials}</div>
-    <div class="agent-name">${agent.name}</div>
-    <div class="agent-dre">DRE #${agent.dre}</div>`;
-  card.onclick = () => {
-    document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('selected'));
-    card.classList.add('selected');
-    selectedAgent = AGENTS[i];
-  };
+  card.innerHTML = `<div class="agent-initial">${agent.initials}</div><div class="agent-name">${agent.name}</div><div class="agent-dre">DRE #${agent.dre}</div>`;
+  card.onclick = () => { document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('selected')); card.classList.add('selected'); selectedAgent = AGENTS[i]; };
   grid.appendChild(card);
 });
 
-// ─────────────────────────────────────────────
-// MODE SELECTION
-// ─────────────────────────────────────────────
 function selectMode(mode) {
   selectedMode = mode;
-  const discCard = document.getElementById('modeDisclosure');
-  const condCard = document.getElementById('modeCondition');
-  discCard.classList.remove('selected-disclosure', 'selected-condition');
-  condCard.classList.remove('selected-disclosure', 'selected-condition');
-
+  document.getElementById('modeDisclosure').classList.remove('selected-disclosure','selected-condition');
+  document.getElementById('modeCondition').classList.remove('selected-disclosure','selected-condition');
   if (mode === 'disclosure') {
-    discCard.classList.add('selected-disclosure');
+    document.getElementById('modeDisclosure').classList.add('selected-disclosure');
     document.getElementById('step4Title').textContent = 'Disclosure Documents';
     document.getElementById('driveSectionTitle').textContent = 'Select Transaction Folder — Auto-reads A2 Disclosures';
-    document.getElementById('driveSectionHint').textContent = 'Select the client\'s transaction folder and the tool will automatically find and read all documents in the A2. Disclosures & Reports subfolder.';
+    document.getElementById('driveSectionHint').textContent = "Select the client's transaction folder and the tool will automatically find and read all documents in the A2. Disclosures & Reports subfolder.";
     document.getElementById('driveBtnText').textContent = 'Select Transaction Folder from Drive';
     document.getElementById('driveFolderSection').className = 'drive-section mode-disclosure';
     document.getElementById('driveFolderBtn').className = 'drive-btn disclosure-btn';
     document.getElementById('generateBtn').className = 'generate-btn btn-disclosure';
     document.getElementById('generateBtn').textContent = '✦ Generate Disclosure Review Report';
   } else {
-    condCard.classList.add('selected-condition');
+    document.getElementById('modeCondition').classList.add('selected-condition');
     document.getElementById('step4Title').textContent = 'Inspection & Repair Documents';
     document.getElementById('driveSectionTitle').textContent = 'Select Transaction Folder — Auto-reads A3 Inspections';
-    document.getElementById('driveSectionHint').textContent = 'Select the client\'s transaction folder and the tool will automatically find and read all documents in the A3. Inspection Reports subfolder.';
+    document.getElementById('driveSectionHint').textContent = "Select the client's transaction folder and the tool will automatically find and read all documents in the A3. Inspection Reports subfolder.";
     document.getElementById('driveBtnText').textContent = 'Select Transaction Folder from Drive';
     document.getElementById('driveFolderSection').className = 'drive-section mode-condition';
     document.getElementById('driveFolderBtn').className = 'drive-btn condition-btn';
     document.getElementById('generateBtn').className = 'generate-btn btn-condition';
     document.getElementById('generateBtn').textContent = '✦ Generate Condition Analysis Report';
   }
-
-  document.getElementById('step3').classList.remove('step-hidden');
-  document.getElementById('step4').classList.remove('step-hidden');
-  document.getElementById('step5').classList.remove('step-hidden');
-
-  uploadedFiles  = [];
-  selectedFolder = null;
-  renderFileList();
+  ['step3','step4','step5'].forEach(id => document.getElementById(id).classList.remove('step-hidden'));
+  uploadedFiles=[]; selectedFolder=null; renderFileList();
   document.getElementById('folderStatus').textContent = '';
 }
 
-// ─────────────────────────────────────────────
-// DRAG & DROP
-// ─────────────────────────────────────────────
 const dropZone = document.getElementById('dropZone');
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor = 'var(--navy)'; });
-dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = ''; });
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.style.borderColor = '';
-  handleFiles(e.dataTransfer.files);
-});
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.borderColor='var(--navy)'; });
+dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor=''; });
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.style.borderColor=''; handleFiles(e.dataTransfer.files); });
 
-// ─────────────────────────────────────────────
-// FILE HELPERS
-// ─────────────────────────────────────────────
-function getFileIcon(name) {
-  const ext = name.toLowerCase().split('.').pop();
-  if (ext === 'pdf') return '📄';
-  if (ext === 'docx' || ext === 'doc') return '📝';
-  return '📎';
-}
-function formatSize(bytes) {
-  if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / 1048576).toFixed(1) + ' MB';
-}
+function getFileIcon(name) { const e=name.toLowerCase().split('.').pop(); return e==='pdf'?'📄':(e==='docx'||e==='doc'?'📝':'📎'); }
+function formatSize(b) { return b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(1)+' MB'; }
 
 async function handleFiles(fileList) {
-  const files   = Array.from(fileList);
-  const skipped = [];
-  for (const file of files) {
-    if (file.size === 0) { skipped.push(file.name); continue; }
-    if (uploadedFiles.find(f => f.name === file.name && f.file.size === file.size)) continue;
-    uploadedFiles.push({ file, name: file.name, fromDrive: false });
+  const skipped=[];
+  for (const file of Array.from(fileList)) {
+    if (file.size===0){skipped.push(file.name);continue;}
+    if (uploadedFiles.find(f=>f.name===file.name&&f.file.size===file.size)) continue;
+    uploadedFiles.push({file,name:file.name,fromDrive:false});
   }
-  if (skipped.length > 0) {
-    alert('Skipped ' + skipped.length + ' empty file(s):\n' + skipped.join('\n') + '\n\nEmpty files cannot be processed.');
-  }
+  if (skipped.length>0) alert('Skipped '+skipped.length+' empty file(s):\n'+skipped.join('\n'));
   renderFileList();
 }
-
-function removeFile(index) {
-  uploadedFiles.splice(index, 1);
-  renderFileList();
-}
-
+function removeFile(i) { uploadedFiles.splice(i,1); renderFileList(); }
 function renderFileList() {
-  const list    = document.getElementById('fileList');
-  const summary = document.getElementById('filesSummary');
-  list.innerHTML = uploadedFiles.map((f, i) => `
-    <div class="file-item">
-      <div class="file-icon">${getFileIcon(f.name)}</div>
-      <div class="file-info">
-        <div class="file-name">${f.name}</div>
-        <div class="file-size">${formatSize(f.file.size)}</div>
-      </div>
-      ${f.fromDrive ? '<span class="file-badge from-drive">Drive</span>' : ''}
-      ${f.autoRead  ? '<span class="file-badge auto-read">Auto</span>' : ''}
-      <span class="file-status ready">✓ Ready</span>
-      <button class="file-remove" onclick="removeFile(${i})" title="Remove">×</button>
-    </div>
-  `).join('');
-
-  const driveCount = uploadedFiles.filter(f => f.fromDrive || f.autoRead).length;
-  const localCount = uploadedFiles.length - driveCount;
-  const parts = [];
-  if (driveCount > 0) parts.push(`${driveCount} from Drive`);
-  if (localCount > 0) parts.push(`${localCount} from computer`);
-  summary.textContent = uploadedFiles.length > 0
-    ? `${uploadedFiles.length} document${uploadedFiles.length > 1 ? 's' : ''} ready${parts.length ? ' (' + parts.join(', ') + ')' : ''} — Claude will read and analyze all content.`
-    : '';
+  const list=document.getElementById('fileList'), summary=document.getElementById('filesSummary');
+  list.innerHTML=uploadedFiles.map((f,i)=>`<div class="file-item"><div class="file-icon">${getFileIcon(f.name)}</div><div class="file-info"><div class="file-name">${f.name}</div><div class="file-size">${formatSize(f.file.size)}</div></div>${f.fromDrive?'<span class="file-badge from-drive">Drive</span>':''}${f.autoRead?'<span class="file-badge auto-read">Auto</span>':''}<span class="file-status ready">✓ Ready</span><button class="file-remove" onclick="removeFile(${i})">×</button></div>`).join('');
+  const dc=uploadedFiles.filter(f=>f.fromDrive||f.autoRead).length, lc=uploadedFiles.length-dc, parts=[];
+  if(dc>0) parts.push(dc+' from Drive'); if(lc>0) parts.push(lc+' from computer');
+  summary.textContent=uploadedFiles.length>0?uploadedFiles.length+' document'+(uploadedFiles.length>1?'s':'')+' ready'+(parts.length?' ('+parts.join(', ')+')':'')+' — Claude will read and analyze all content.':'';
 }
 
-// ─────────────────────────────────────────────
-// GOOGLE DRIVE FOLDER PICKER — FIXED
-// ─────────────────────────────────────────────
 function openDriveFolderPicker() {
-  const statusEl = document.getElementById('folderStatus');
-
-  // Google scripts not loaded yet
-  if (!gapiReady || !gsiReady) {
-    statusEl.textContent = '⏳ Loading Google Drive… please try again in a moment.';
-    return;
-  }
-
-  // APIs loaded but init not fully complete yet — wait and retry once
-  if (!tokenClient || !pickerApiLoaded || !gapiInited) {
-    statusEl.textContent = '⏳ Connecting to Google Drive…';
-    setTimeout(openDriveFolderPicker, 1000);
-    return;
-  }
-
-  // All ready
-  statusEl.textContent = '';
-
-  if (!driveAccessToken) {
-    tokenClient.requestAccessToken({ prompt: 'select_account' });
-    return;
-  }
-
+  const statusEl=document.getElementById('folderStatus');
+  if (!gapiReady||!gsiReady) { statusEl.textContent='⏳ Loading Google Drive… please try again in a moment.'; return; }
+  if (!tokenClient||!pickerApiLoaded||!gapiInited) { statusEl.textContent='⏳ Connecting to Google Drive…'; setTimeout(openDriveFolderPicker,1000); return; }
+  statusEl.textContent='';
+  if (!driveAccessToken) { tokenClient.requestAccessToken({prompt:'select_account'}); return; }
   showFolderPicker();
 }
-
 function showFolderPicker() {
-  const view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
-    .setIncludeFolders(true)
-    .setSelectFolderEnabled(true)
-    .setOwnedByMe(true);
-
-  const picker = new google.picker.PickerBuilder()
-    .setAppId('96917389365')
-    .setOAuthToken(driveAccessToken)
-    .setDeveloperKey(GOOGLE_API_KEY)
-    .addView(view)
-    .setTitle('Select the client transaction folder')
-    .setCallback(folderPickerCallback)
-    .build();
-  picker.setVisible(true);
+  const view=new google.picker.DocsView(google.picker.ViewId.FOLDERS).setIncludeFolders(true).setSelectFolderEnabled(true).setOwnedByMe(true);
+  new google.picker.PickerBuilder().setAppId('96917389365').setOAuthToken(driveAccessToken).setDeveloperKey(GOOGLE_API_KEY).addView(view).setTitle('Select the client transaction folder').setCallback(folderPickerCallback).build().setVisible(true);
 }
-
 async function folderPickerCallback(data) {
-  if (data.action !== google.picker.Action.PICKED) return;
-  const folder = data.docs[0];
-  selectedFolder = { id: folder.id, name: folder.name };
-
-  const statusEl = document.getElementById('folderStatus');
-  statusEl.textContent = `📁 Selected: ${folder.name} — scanning for documents…`;
-
-  await readSubfolderFiles(folder.id, folder.name);
+  if (data.action!==google.picker.Action.PICKED) return;
+  const folder=data.docs[0]; selectedFolder={id:folder.id,name:folder.name};
+  document.getElementById('folderStatus').textContent=`📁 Selected: ${folder.name} — scanning for documents…`;
+  await readSubfolderFiles(folder.id,folder.name);
 }
-
-async function readSubfolderFiles(parentFolderId, parentFolderName) {
-  const statusEl      = document.getElementById('folderStatus');
-  const subfolderName = selectedMode === 'disclosure' ? 'A2' : 'A3';
-
+async function readSubfolderFiles(parentId,parentName) {
+  const statusEl=document.getElementById('folderStatus'), sub=selectedMode==='disclosure'?'A2':'A3';
   try {
-    // Step 1: Find "3. Active Transaction" inside parent
-    statusEl.textContent = `📁 ${parentFolderName} — finding Active Transaction folder…`;
-    const activeRes = await fetch(
-      `https://www.googleapis.com/drive/v3/files?q='${parentFolderId}' in parents and name contains '3. Active Transaction' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`,
-      { headers: { Authorization: `Bearer ${driveAccessToken}` } }
-    );
-    const activeData = await activeRes.json();
-    if (!activeData.files || activeData.files.length === 0) {
-      statusEl.textContent = `⚠️ Could not find "3. Active Transaction" folder inside ${parentFolderName}. Please upload files manually.`;
-      return;
-    }
-    const activeFolder = activeData.files[0];
-
-    // Step 2: Find A2 or A3 inside Active Transaction
-    statusEl.textContent = `📁 Finding ${subfolderName} subfolder…`;
-    const subRes = await fetch(
-      `https://www.googleapis.com/drive/v3/files?q='${activeFolder.id}' in parents and name contains '${subfolderName}' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`,
-      { headers: { Authorization: `Bearer ${driveAccessToken}` } }
-    );
-    const subData = await subRes.json();
-    if (!subData.files || subData.files.length === 0) {
-      statusEl.textContent = `⚠️ Could not find "${subfolderName}" subfolder. Please upload files manually.`;
-      return;
-    }
-    const subFolder = subData.files[0];
-
-    // Step 3: List all PDF/DOCX files in that subfolder
-    statusEl.textContent = `📁 Reading files from ${subFolder.name}…`;
-    const filesRes = await fetch(
-      `https://www.googleapis.com/drive/v3/files?q='${subFolder.id}' in parents and trashed=false and (mimeType='application/pdf' or mimeType='application/vnd.openxmlformats-officedocument.wordprocessingml.document')&fields=files(id,name,size,mimeType)&orderBy=name`,
-      { headers: { Authorization: `Bearer ${driveAccessToken}` } }
-    );
-    const filesData = await filesRes.json();
-    const driveFiles = filesData.files || [];
-
-    if (driveFiles.length === 0) {
-      statusEl.textContent = `⚠️ No PDF or DOCX files found in ${subFolder.name}. Please upload files manually.`;
-      return;
-    }
-
-    // Step 4: Download each file
-    uploadedFiles = uploadedFiles.filter(f => !f.autoRead);
-    let downloaded = 0;
-    const skipped  = [];
-
-    for (const driveFile of driveFiles) {
+    statusEl.textContent=`📁 ${parentName} — finding Active Transaction folder…`;
+    const ar=await fetch(`https://www.googleapis.com/drive/v3/files?q='${parentId}' in parents and name contains '3. Active Transaction' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`,{headers:{Authorization:`Bearer ${driveAccessToken}`}});
+    const ad=await ar.json();
+    if (!ad.files||!ad.files.length){statusEl.textContent=`⚠️ Could not find "3. Active Transaction" inside ${parentName}. Please upload manually.`;return;}
+    const af=ad.files[0];
+    statusEl.textContent=`📁 Finding ${sub} subfolder…`;
+    const sr=await fetch(`https://www.googleapis.com/drive/v3/files?q='${af.id}' in parents and name contains '${sub}' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`,{headers:{Authorization:`Bearer ${driveAccessToken}`}});
+    const sd=await sr.json();
+    if (!sd.files||!sd.files.length){statusEl.textContent=`⚠️ Could not find "${sub}" subfolder. Please upload manually.`;return;}
+    const sf=sd.files[0];
+    statusEl.textContent=`📁 Reading files from ${sf.name}…`;
+    const fr=await fetch(`https://www.googleapis.com/drive/v3/files?q='${sf.id}' in parents and trashed=false and (mimeType='application/pdf' or mimeType='application/vnd.openxmlformats-officedocument.wordprocessingml.document')&fields=files(id,name,size,mimeType)&orderBy=name`,{headers:{Authorization:`Bearer ${driveAccessToken}`}});
+    const fd=await fr.json(); const driveFiles=fd.files||[];
+    if (!driveFiles.length){statusEl.textContent=`⚠️ No PDFs found in ${sf.name}. Please upload manually.`;return;}
+    uploadedFiles=uploadedFiles.filter(f=>!f.autoRead);
+    let downloaded=0; const skipped=[];
+    for (const df of driveFiles) {
       try {
-        statusEl.textContent = `⬇️ Downloading ${driveFile.name} (${downloaded + 1} of ${driveFiles.length})…`;
-        const dlRes = await fetch(
-          `https://www.googleapis.com/drive/v3/files/${driveFile.id}?alt=media`,
-          { headers: { Authorization: `Bearer ${driveAccessToken}` } }
-        );
-        if (!dlRes.ok) { skipped.push(driveFile.name + ' (download failed)'); continue; }
-        const blob = await dlRes.blob();
-        if (blob.size === 0) { skipped.push(driveFile.name + ' (empty)'); continue; }
-        const file = new File([blob], driveFile.name, { type: driveFile.mimeType });
-        if (!uploadedFiles.find(f => f.name === file.name)) {
-          uploadedFiles.push({ file, name: file.name, fromDrive: true, autoRead: true });
-        }
+        statusEl.textContent=`⬇️ Downloading ${df.name} (${downloaded+1} of ${driveFiles.length})…`;
+        const dlr=await fetch(`https://www.googleapis.com/drive/v3/files/${df.id}?alt=media`,{headers:{Authorization:`Bearer ${driveAccessToken}`}});
+        if (!dlr.ok){skipped.push(df.name+' (download failed)');continue;}
+        const blob=await dlr.blob();
+        if (!blob.size){skipped.push(df.name+' (empty)');continue;}
+        const file=new File([blob],df.name,{type:df.mimeType});
+        if (!uploadedFiles.find(f=>f.name===file.name)) uploadedFiles.push({file,name:file.name,fromDrive:true,autoRead:true});
         downloaded++;
-      } catch(e) { skipped.push(driveFile.name + ' (error)'); }
+      } catch(e){skipped.push(df.name+' (error)');}
     }
-
-    statusEl.textContent = `✅ ${downloaded} file${downloaded !== 1 ? 's' : ''} loaded from ${subFolder.name}${skipped.length > 0 ? ' (' + skipped.length + ' skipped)' : ''}`;
+    statusEl.textContent=`✅ ${downloaded} file${downloaded!==1?'s':''} loaded from ${sf.name}${skipped.length?' ('+skipped.length+' skipped)':''}`;
     renderFileList();
-    if (skipped.length > 0) alert('Could not load:\n' + skipped.join('\n'));
-
-  } catch(e) {
-    statusEl.textContent = `⚠️ Error reading Drive: ${e.message}. Please upload files manually.`;
-    console.error(e);
-  }
+    if (skipped.length) alert('Could not load:\n'+skipped.join('\n'));
+  } catch(e){statusEl.textContent=`⚠️ Error: ${e.message}. Please upload manually.`;console.error(e);}
 }
 
-// ─────────────────────────────────────────────
-// GENERATE REPORT
-// ─────────────────────────────────────────────
 async function generateReport() {
-  if (!ANTHROPIC_API_KEY)         { alert('Configuration not loaded. Please wait and try again.'); return; }
-  if (!selectedAgent)             { alert('Please select an agent.'); return; }
-  if (!selectedMode)              { alert('Please select a report type.'); return; }
-  const address = document.getElementById('propAddress').value.trim();
-  const seller  = document.getElementById('sellerName').value.trim();
-  if (!address || !seller)        { alert('Please enter property address and seller name.'); return; }
-  if (uploadedFiles.length === 0) { alert('Please add documents — either from Drive or upload manually.'); return; }
-
-  const btn        = document.getElementById('generateBtn');
-  const statusBar  = document.getElementById('statusBar');
-  const statusText = document.getElementById('statusText');
-
-  btn.disabled = true;
-  document.getElementById('report-output').style.display = 'none';
-  statusBar.className = 'status-bar loading';
-
-  const setStatus = msg => { statusText.textContent = msg; };
-  const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-
+  if (!selectedAgent){alert('Please select an agent.');return;}
+  if (!selectedMode){alert('Please select a report type.');return;}
+  const address=document.getElementById('propAddress').value.trim(), seller=document.getElementById('sellerName').value.trim();
+  if (!address||!seller){alert('Please enter property address and seller name.');return;}
+  if (!uploadedFiles.length){alert('Please add documents — either from Drive or upload manually.');return;}
+  const btn=document.getElementById('generateBtn'), statusBar=document.getElementById('statusBar'), statusText=document.getElementById('statusText');
+  btn.disabled=true; document.getElementById('report-output').style.display='none'; statusBar.className='status-bar loading';
+  const setStatus=msg=>{statusText.textContent=msg;};
+  const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
   try {
-    const fileContents = [];
-    for (let i = 0; i < uploadedFiles.length; i++) {
-      const f = uploadedFiles[i];
-      setStatus(`Preparing ${f.name} (${i + 1} of ${uploadedFiles.length})…`);
-      const base64 = await fileToBase64(f.file);
-      fileContents.push({ name: f.name, base64, mediaType: f.file.type || 'application/pdf' });
+    const fileContents=[];
+    for (let i=0;i<uploadedFiles.length;i++){
+      const f=uploadedFiles[i]; setStatus(`Preparing ${f.name} (${i+1} of ${uploadedFiles.length})…`);
+      const base64=await fileToBase64(f.file);
+      fileContents.push({name:f.name,base64,mediaType:f.file.type||'application/pdf'});
     }
-
     setStatus('Sending to Claude for analysis…');
-
-    const GROUP_SIZE = 3;
-    const groups = [];
-    for (let i = 0; i < fileContents.length; i += GROUP_SIZE) {
-      groups.push(fileContents.slice(i, i + GROUP_SIZE));
-    }
-
-    const prompt = selectedMode === 'disclosure'
-      ? buildDisclosurePrompt(address, seller, today)
-      : buildConditionPrompt(address, seller, today);
-
-    let fullReport = '';
-
-    if (groups.length === 1) {
-      fullReport = await callClaude(groups[0], prompt, setStatus);
+    const GROUP_SIZE=3, groups=[];
+    for (let i=0;i<fileContents.length;i+=GROUP_SIZE) groups.push(fileContents.slice(i,i+GROUP_SIZE));
+    const prompt=selectedMode==='disclosure'?buildDisclosurePrompt(address,seller,today):buildConditionPrompt(address,seller,today);
+    let fullReport='';
+    if (groups.length===1){
+      fullReport=await callClaude(groups[0],prompt,setStatus);
     } else {
-      const groupFindings = [];
-      for (let g = 0; g < groups.length; g++) {
-        if (g > 0) {
-          setStatus(`Pausing between document groups… (${g} of ${groups.length} complete)`);
-          await new Promise(r => setTimeout(r, 60000));
-        }
-        setStatus(`Analyzing group ${g + 1} of ${groups.length}…`);
-        const groupResult = await callClaude(groups[g], buildGroupPrompt(g, groups.length, selectedMode), setStatus);
-        groupFindings.push(groupResult);
+      const findings=[];
+      for (let g=0;g<groups.length;g++){
+        if(g>0){setStatus(`Pausing…(${g} of ${groups.length} complete)`);await new Promise(r=>setTimeout(r,60000));}
+        setStatus(`Analyzing group ${g+1} of ${groups.length}…`);
+        findings.push(await callClaude(groups[g],`This is document group ${g+1} of ${groups.length}. Extract all findings. Do not write a final report yet.`,setStatus));
       }
       setStatus('Synthesizing full report…');
-      fullReport = await synthesizeReport(groupFindings, address, seller, today, prompt);
+      fullReport=await callClaude([],`Synthesize these group findings into a complete report:\n\n${findings.join('\n\n---\n\n')}\n\n${prompt}`,setStatus);
     }
-
-    generatedReport = fullReport;
-    document.getElementById('reportBody').textContent = generatedReport;
-
-    const headerBar = document.getElementById('reportHeaderBar');
-    headerBar.className = selectedMode === 'disclosure'
-      ? 'report-header-bar disclosure-header'
-      : 'report-header-bar condition-header';
-
-    document.getElementById('report-output').style.display = 'block';
-    statusBar.className = 'status-bar';
-    document.getElementById('report-output').scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-  } catch(err) {
-    statusBar.className = 'status-bar error';
-    statusText.textContent = 'Error: ' + err.message;
-    console.error(err);
-  } finally {
-    btn.disabled = false;
-  }
+    generatedReport=fullReport;
+    document.getElementById('reportBody').textContent=generatedReport;
+    document.getElementById('reportHeaderBar').className=selectedMode==='disclosure'?'report-header-bar disclosure-header':'report-header-bar condition-header';
+    document.getElementById('report-output').style.display='block';
+    statusBar.className='status-bar';
+    document.getElementById('report-output').scrollIntoView({behavior:'smooth',block:'start'});
+  } catch(err){
+    statusBar.className='status-bar error'; statusText.textContent='Error: '+err.message; console.error(err);
+  } finally { btn.disabled=false; }
 }
 
 async function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = () => reject(new Error('Failed to read file'));
-    reader.readAsDataURL(file);
-  });
+  return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result.split(',')[1]);r.onerror=()=>reject(new Error('Failed to read file'));r.readAsDataURL(file);});
 }
 
-async function callClaude(files, userPrompt, setStatus) {
-  const content = [];
+async function callClaude(files,userPrompt,setStatus) {
+  const content=[];
   for (const f of files) {
-    if (f.mediaType === 'application/pdf') {
-      content.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: f.base64 } });
-    } else {
-      content.push({ type: 'text', text: `[Document: ${f.name}]\n(Non-PDF document — analyze filename and any extractable content)` });
-    }
+    if (f.mediaType==='application/pdf') content.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:f.base64}});
+    else content.push({type:'text',text:`[Document: ${f.name}]`});
   }
-  content.push({ type: 'text', text: userPrompt });
-
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4000,
-      system: getSystemPrompt(),
-      messages: [{ role: 'user', content }]
+  content.push({type:'text',text:userPrompt});
+  const res=await fetch('/.netlify/functions/claude',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',max_tokens:4000,
+      system:`You are a highly experienced California real estate advisor with 22 years as a listing agent and 18 years in construction. You combine deep knowledge of California disclosure requirements (TDS, SPQ, NHD, AVID, FIRPTA), construction defects, deferred maintenance, listing strategy, negotiation, and risk assessment for sellers. Your role is to protect the seller by identifying risks, gaps, and negotiation strategy. Plain text only. No markdown. No asterisks. No pound signs. Use ALL CAPS for section headers.`,
+      messages:[{role:'user',content}]
     })
   });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `API error ${res.status}`);
-  }
-  const data = await res.json();
-  return data.content.filter(c => c.type === 'text').map(c => c.text).join('');
+  if (!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.error?.message||`API error ${res.status}`);}
+  const data=await res.json();
+  return data.content.filter(c=>c.type==='text').map(c=>c.text).join('');
 }
 
-async function synthesizeReport(findings, address, seller, today, finalPrompt) {
-  const combinedFindings = findings.join('\n\n---GROUP BREAK---\n\n');
-  const content = [{
-    type: 'text',
-    text: `The following are findings from analyzing the transaction documents in groups. Please synthesize these into a complete, cohesive report in the exact output format specified.\n\nFINDINGS FROM ALL DOCUMENT GROUPS:\n${combinedFindings}\n\n${finalPrompt}`
-  }];
-
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 4000,
-      system: getSystemPrompt(),
-      messages: [{ role: 'user', content }]
-    })
-  });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `API error ${res.status}`);
-  }
-  const data = await res.json();
-  return data.content.filter(c => c.type === 'text').map(c => c.text).join('');
-}
-
-function buildGroupPrompt(groupIndex, totalGroups) {
-  return `This is document group ${groupIndex + 1} of ${totalGroups}. Extract all findings from these documents. Note document names, execution status, party names, key dates, and any risk items. Do not write a final report yet — just extract and summarize findings clearly.`;
-}
-
-function getSystemPrompt() {
-  return `You are a highly experienced California real estate advisor with 22 years as a listing agent and 18 years in construction. You combine deep knowledge of:
-- California disclosure requirements (TDS, SPQ, NHD, AVID, FIRPTA)
-- Construction defects, deferred maintenance, and property condition
-- Listing strategy and negotiation
-- Risk assessment for sellers
-
-Your role is to protect the seller by identifying risks, gaps, and negotiation strategy — not to scare them, but to prepare them with clear, actionable intelligence.
-
-Plain text only. No markdown. No asterisks. No pound signs. Use ALL CAPS for section headers.`;
-}
-
-function buildDisclosurePrompt(address, seller, today) {
-  return `Generate a complete SMART SELLER PROTECTION REPORT™ — Disclosure Review for the following transaction.
+function buildDisclosurePrompt(address,seller,today){return `Generate a complete SMART SELLER PROTECTION REPORT™ — Disclosure Review.
 
 Property Address: ${address}
 Seller Name: ${seller}
@@ -827,7 +469,7 @@ Date: ${today}
 Prepared By: ${selectedAgent.name} | SZ Real Estate Group
 Agent License #: ${selectedAgent.dre}
 
-Analyze all provided disclosure documents (TDS, SPQ, NHD, AVID-LA, Preliminary Title Report) and produce a complete report following this exact format:
+Analyze all provided disclosure documents and produce a complete report:
 
 SMART SELLER PROTECTION REPORT™
 Listing Disclosure Review
@@ -842,7 +484,7 @@ Agent License #: ${selectedAgent.dre}
 
 EXECUTIVE SUMMARY
 
-[Overview of disclosure package completeness, overall risk level, key concerns identified, and general listing readiness. Note every document reviewed.]
+[Overview of disclosure package completeness, overall risk level, key concerns, and listing readiness.]
 
 Disclosure Package Status: [Complete / Incomplete / Needs Attention]
 Overall Risk Level: [Low / Moderate / Elevated]
@@ -852,13 +494,11 @@ Listing Readiness: [Ready / Needs Work / Address Before Listing]
 
 DOCUMENTS REVIEWED
 
-[List every document analyzed with document type and status]
+[List every document analyzed]
 
 ----------------------------------------
 
 DISCLOSURE COMPLETENESS CHECK
-
-[For each standard disclosure document, note: Present / Missing / Incomplete]
 
 TDS (Transfer Disclosure Statement): [status]
 SPQ (Seller Property Questionnaire): [status]
@@ -867,62 +507,45 @@ AVID-LA (Agent Visual Inspection): [status]
 Preliminary Title Report: [status]
 FIRPTA Affidavit: [status]
 Other documents present: [list]
-Missing recommended disclosures: [list any gaps]
+Missing recommended disclosures: [list]
 
 ----------------------------------------
 
 RISK FLAGS — ITEMS A BUYER'S AGENT WILL CHALLENGE
 
-[For each flag:]
-[FLAG TITLE IN ALL CAPS]
-
-Source: [document name]
-Risk Level: [Low / Moderate / High]
-Category: [Legal / Physical / Environmental / Title / Disclosure Gap]
-
-[Description of the issue. What a buyer's agent will say. How common it is.]
-
-Seller Recommendation:
-[What the seller should do — clarify, repair, disclose proactively, or accept as-is]
+[For each flag — TITLE IN ALL CAPS, Source, Risk Level, Category, description, Seller Recommendation]
 
 ----------------------------------------
 
 TITLE & OWNERSHIP REVIEW
 
-[From Preliminary Title Report: vesting, liens, easements, CC&Rs, encumbrances, anything that could delay or kill the deal]
+[Vesting, liens, easements, CC&Rs, encumbrances]
 
 ----------------------------------------
 
 NATURAL HAZARD EXPOSURE
 
-[From NHD: flood zone, fire zone, seismic, liquefaction. For each: insurance implications, disclosure obligations, buyer concern level]
+[Flood zone, fire zone, seismic, liquefaction — insurance implications and buyer concern level]
 
 ----------------------------------------
 
 MISSING OR VAGUE DISCLOSURES
 
-[Items where seller responses are blank, vague, or contradictory. Items that need clarification before listing. Missing permits or documentation.]
+[Blank, vague, or contradictory seller responses. Missing permits.]
 
 ----------------------------------------
 
 PRE-LISTING RECOMMENDATIONS
 
-[Prioritized action list for the seller before going live. What to fix, what to disclose proactively, what to leave as-is and price accordingly.]
-
-Priority 1 — Must Address:
-[list]
-
-Priority 2 — Recommended:
-[list]
-
-Priority 3 — Optional:
-[list]
+Priority 1 — Must Address: [list]
+Priority 2 — Recommended: [list]
+Priority 3 — Optional: [list]
 
 ----------------------------------------
 
 AGENT NOTES FOR LISTING CONSULTATION
 
-[Talking points for Sam/John to cover with seller. Objections to anticipate. Pricing impact of known conditions. Items that could affect days on market.]
+[Talking points, objections to anticipate, pricing impact, days on market considerations]
 
 ----------------------------------------
 
@@ -933,7 +556,7 @@ Physical Condition: [Good / Fair / Needs Work]
 Title Status: [Clean / Issues to Resolve]
 Listing Risk: [Low / Moderate / Elevated]
 
-[3-4 sentences summarizing overall readiness and recommended next steps.]
+[3-4 sentence summary]
 
 ----------------------------------------
 
@@ -944,11 +567,9 @@ Broker License #: 02066500
 Agent: ${selectedAgent.name}
 Agent License #: ${selectedAgent.dre}
 
-This report was prepared for seller advisory purposes only and does not constitute legal advice. Agent verification required before listing.`;
-}
+This report was prepared for seller advisory purposes only and does not constitute legal advice. Agent verification required before listing.`;}
 
-function buildConditionPrompt(address, seller, today) {
-  return `Generate a complete SMART SELLER PROTECTION REPORT™ — Condition Analysis for the following transaction.
+function buildConditionPrompt(address,seller,today){return `Generate a complete SMART SELLER PROTECTION REPORT™ — Condition Analysis.
 
 Property Address: ${address}
 Seller Name: ${seller}
@@ -956,7 +577,7 @@ Date: ${today}
 Prepared By: ${selectedAgent.name} | SZ Real Estate Group
 Agent License #: ${selectedAgent.dre}
 
-Analyze all provided inspection reports, pest reports, and repair requests (RFRs) and produce a complete report following this exact format:
+Analyze all provided inspection reports, pest reports, and RFRs:
 
 SMART SELLER PROTECTION REPORT™
 In-Contract Condition Analysis
@@ -971,7 +592,7 @@ Agent License #: ${selectedAgent.dre}
 
 EXECUTIVE SUMMARY
 
-[Overview of property condition, inspection findings, current RFR status, overall negotiation position. Note every document reviewed.]
+[Overview of condition, findings, RFR status, negotiation position]
 
 Overall Condition: [Good / Fair / Needs Work]
 RFR Risk Level: [Low / Moderate / High]
@@ -981,13 +602,11 @@ Negotiation Position: [Strong / Neutral / Challenging]
 
 DOCUMENTS REVIEWED
 
-[List every inspection report, pest report, and RFR with date and inspector/party names]
+[List every document with date and inspector/party names]
 
 ----------------------------------------
 
 INSPECTION FINDINGS SUMMARY
-
-[For each inspection report, summarize key findings by category:]
 
 STRUCTURAL & FOUNDATION
 [findings]
@@ -1005,7 +624,7 @@ HVAC
 [findings]
 
 PEST & WOOD DESTROYING ORGANISMS
-[findings — Section I vs Section II]
+[Section I vs Section II findings]
 
 OTHER FINDINGS
 [findings]
@@ -1014,52 +633,40 @@ OTHER FINDINGS
 
 RFR ANALYSIS — ITEM BY ITEM
 
-[For each item in the Repair Request(s):]
-
-[ITEM NAME IN ALL CAPS]
-
-Buyer Requested: [exact request]
-Classification: [Legitimate / Aggressive / Unreasonable]
-Seller Recommendation: [Accept / Counter / Decline]
-Rationale: [why — inspection finding, market norms, liability]
+[For each item: ITEM NAME IN ALL CAPS, Buyer Requested, Classification, Seller Recommendation, Rationale]
 
 ----------------------------------------
 
 NEGOTIATION STRATEGY
 
-Items to ACCEPT:
-[list with brief rationale for each]
-
-Items to COUNTER:
-[list with suggested counter-position for each]
-
-Items to DECLINE:
-[list with rationale for each — why it's unreasonable or not seller's obligation]
+Items to ACCEPT: [list with rationale]
+Items to COUNTER: [list with counter-position]
+Items to DECLINE: [list with rationale]
 
 Overall Recommended Response: [Credit / Repairs / Combination / As-Is]
-Suggested Credit Amount: [if applicable — range only, not exact]
+Suggested Credit Amount: [range only if applicable]
 
 ----------------------------------------
 
 COE RISK ASSESSMENT
 
-[Items that could jeopardize closing if not addressed. Financing concerns. Permit issues. Pest clearance requirements. Timeline risks.]
+[Items that could jeopardize closing, financing concerns, permit issues, timeline risks]
 
 ----------------------------------------
 
 AGENT NOTES FOR SELLER CONVERSATION
 
-[How to present this to the seller. Emotional considerations. What's non-negotiable from buyer's side. Where seller has leverage. How to frame the recommendation.]
+[How to present, emotional considerations, leverage points]
 
 ----------------------------------------
 
 OVERALL POSITION
 
-Inspection Results: [Better / As Expected / Worse than expected for age and price]
+Inspection Results: [Better / As Expected / Worse than expected]
 RFR Reasonableness: [Reasonable / Slightly aggressive / Very aggressive]
-Recommended Action: [Accept as submitted / Counter with X / Decline and defend]
+Recommended Action: [Accept / Counter / Decline and defend]
 
-[3-4 sentences on overall negotiation position and path to closing.]
+[3-4 sentence summary]
 
 ----------------------------------------
 
@@ -1070,93 +677,37 @@ Broker License #: 02066500
 Agent: ${selectedAgent.name}
 Agent License #: ${selectedAgent.dre}
 
-This report was prepared for seller advisory purposes only and does not constitute legal advice. Agent verification required before COE.`;
-}
+This report was prepared for seller advisory purposes only. Agent verification required before COE.`;}
 
-// ─────────────────────────────────────────────
-// COPY / PRINT / SEND / RESET
-// ─────────────────────────────────────────────
-function copyReport() {
-  navigator.clipboard.writeText(generatedReport).then(() => {
-    const btn = event.target;
-    btn.textContent = 'Copied!';
-    setTimeout(() => btn.textContent = 'Copy Report', 2000);
-  });
-}
+function copyReport(){navigator.clipboard.writeText(generatedReport).then(()=>{const b=event.target;b.textContent='Copied!';setTimeout(()=>b.textContent='Copy Report',2000);});}
+function printReport(){const w=window.open('','_blank');w.document.write(`<html><head><title>SSPR</title><style>body{font-family:Georgia,serif;font-size:13px;line-height:1.8;max-width:700px;margin:40px auto;}pre{white-space:pre-wrap;font-family:Georgia,serif;}</style></head><body><pre>${generatedReport.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre></body></html>`);w.document.close();w.print();}
 
-function printReport() {
-  const win = window.open('', '_blank');
-  win.document.write(`<html><head><title>Smart Seller Protection Report</title>
-  <style>body{font-family:Georgia,serif;font-size:13px;line-height:1.8;max-width:700px;margin:40px auto;color:#111;}pre{white-space:pre-wrap;font-family:Georgia,serif;}</style></head>
-  <body><pre>${generatedReport.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre></body></html>`);
-  win.document.close();
-  win.print();
-}
-
-async function sendToPabbly() {
-  const address      = document.getElementById('propAddress').value.trim();
-  const seller       = document.getElementById('sellerName').value.trim();
-  const today        = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-  const pabblyStatus = document.getElementById('pabblyStatus');
-  const webhookUrl   = selectedMode === 'disclosure' ? PABBLY_DISCLOSURE : PABBLY_CONDITION;
-
-  pabblyStatus.className = 'pabbly-status sending';
-  pabblyStatus.innerHTML = '<div style="width:15px;height:15px;border:2px solid rgba(34,85,170,0.2);border-top-color:#2255aa;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;"></div>&nbsp;Sending to Google Drive via Pabbly…';
-
-  const streetOnly = address.split(/,|\s+(?:Sacramento|Rocklin|Elk Grove|Folsom|Roseville|Citrus Heights|Rancho Cordova)/i)[0].trim();
-
-  const payload = {
-    report_mode:      selectedMode,
-    property_address: address,
-    street_address:   streetOnly,
-    seller_name:      seller,
-    date:             today,
-    agent_name:       selectedAgent.name,
-    agent_dre:        selectedAgent.dre,
-    brokerage_name:   'SZ Real Estate Group',
-    report_body:      generatedReport
-  };
-
+async function sendToPabbly(){
+  const address=document.getElementById('propAddress').value.trim(),seller=document.getElementById('sellerName').value.trim();
+  const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const ps=document.getElementById('pabblyStatus'),url=selectedMode==='disclosure'?PABBLY_DISCLOSURE:PABBLY_CONDITION;
+  ps.className='pabbly-status sending';ps.innerHTML='<div style="width:15px;height:15px;border:2px solid rgba(34,85,170,0.2);border-top-color:#2255aa;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;"></div>&nbsp;Sending to Google Drive via Pabbly…';
+  const streetOnly=address.split(/,|\s+(?:Sacramento|Rocklin|Elk Grove|Folsom|Roseville|Citrus Heights|Rancho Cordova)/i)[0].trim();
   try {
-    await fetch(webhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    pabblyStatus.className = 'pabbly-status sent';
-    pabblyStatus.innerHTML = '✓ Sent to Pabbly — Google Doc will appear in your Drive folder shortly.';
-    document.getElementById('pabblyBtn').textContent = '✓ Sent to Drive';
-    document.getElementById('pabblyBtn').disabled = true;
-  } catch(err) {
-    pabblyStatus.className = 'pabbly-status failed';
-    pabblyStatus.innerHTML = '✗ Failed to reach Pabbly. Check webhook URL.';
-  }
+    await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({report_mode:selectedMode,property_address:address,street_address:streetOnly,seller_name:seller,date:today,agent_name:selectedAgent.name,agent_dre:selectedAgent.dre,brokerage_name:'SZ Real Estate Group',report_body:generatedReport})});
+    ps.className='pabbly-status sent';ps.innerHTML='✓ Sent to Pabbly — Google Doc will appear in your Drive folder shortly.';
+    document.getElementById('pabblyBtn').textContent='✓ Sent to Drive';document.getElementById('pabblyBtn').disabled=true;
+  } catch(e){ps.className='pabbly-status failed';ps.innerHTML='✗ Failed to reach Pabbly.';}
 }
 
-function resetForm() {
-  document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('selected'));
-  document.getElementById('modeDisclosure').classList.remove('selected-disclosure', 'selected-condition');
-  document.getElementById('modeCondition').classList.remove('selected-disclosure', 'selected-condition');
-  selectedAgent   = null;
-  selectedMode    = null;
-  selectedFolder  = null;
-  uploadedFiles   = [];
-  generatedReport = '';
-  document.getElementById('propAddress').value        = '';
-  document.getElementById('sellerName').value         = '';
-  document.getElementById('fileList').innerHTML       = '';
-  document.getElementById('filesSummary').textContent = '';
-  document.getElementById('fileInput').value          = '';
-  document.getElementById('folderStatus').textContent = '';
-  document.getElementById('step3').classList.add('step-hidden');
-  document.getElementById('step4').classList.add('step-hidden');
-  document.getElementById('step5').classList.add('step-hidden');
-  document.getElementById('report-output').style.display = 'none';
-  document.getElementById('statusBar').className      = 'status-bar';
-  document.getElementById('pabblyStatus').className   = 'pabbly-status';
-  document.getElementById('pabblyBtn').textContent    = 'Save to Google Drive';
-  document.getElementById('pabblyBtn').disabled       = false;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+function resetForm(){
+  document.querySelectorAll('.agent-card').forEach(c=>c.classList.remove('selected'));
+  ['modeDisclosure','modeCondition'].forEach(id=>document.getElementById(id).classList.remove('selected-disclosure','selected-condition'));
+  selectedAgent=null;selectedMode=null;selectedFolder=null;uploadedFiles=[];generatedReport='';
+  ['propAddress','sellerName'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fileList').innerHTML='';document.getElementById('filesSummary').textContent='';
+  document.getElementById('fileInput').value='';document.getElementById('folderStatus').textContent='';
+  ['step3','step4','step5'].forEach(id=>document.getElementById(id).classList.add('step-hidden'));
+  document.getElementById('report-output').style.display='none';
+  document.getElementById('statusBar').className='status-bar';
+  document.getElementById('pabblyStatus').className='pabbly-status';
+  document.getElementById('pabblyBtn').textContent='Save to Google Drive';document.getElementById('pabblyBtn').disabled=false;
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 </script>
 </body>
