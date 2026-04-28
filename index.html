@@ -21,13 +21,13 @@
   header{background:var(--navy);padding:0;position:relative;overflow:hidden;}
   header::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:rgba(200,168,75,0.07);}
   header::after{content:'';position:absolute;bottom:-40px;left:8%;width:200px;height:200px;border-radius:50%;background:rgba(200,168,75,0.04);}
-  .header-inner{max-width:900px;margin:0 auto;padding:36px 32px 30px;position:relative;z-index:1;}
+  .header-inner{max-width:860px;margin:0 auto;padding:36px 32px 30px;position:relative;z-index:1;}
   .header-badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);border:1px solid rgba(200,168,75,0.4);padding:4px 12px;border-radius:20px;margin-bottom:12px;}
   .header-title{font-family:'Cormorant Garamond',serif;font-size:34px;color:var(--white);line-height:1.15;font-weight:700;}
   .header-title span{color:var(--gold);}
   .header-sub{font-size:13px;color:rgba(255,255,255,0.5);margin-top:6px;font-weight:300;}
   .brokerage-line{margin-top:16px;font-size:12px;color:rgba(255,255,255,0.35);letter-spacing:0.5px;}
-  main{max-width:900px;margin:0 auto;padding:36px 24px 60px;}
+  main{max-width:860px;margin:0 auto;padding:36px 24px 60px;}
   .card{background:var(--white);border-radius:12px;box-shadow:var(--shadow);padding:32px;margin-bottom:24px;border:1px solid var(--border);}
   .card-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:700;color:var(--navy);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
   .step-num{width:26px;height:26px;background:var(--navy);color:var(--gold);border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -39,22 +39,22 @@
   .agent-card.selected .agent-initial{background:var(--gold);color:var(--navy);}
   .agent-name{font-size:12px;font-weight:600;color:var(--text);transition:color 0.2s;line-height:1.3;}
   .agent-card.selected .agent-name{color:var(--white);}
-  .agent-dre{font-size:10px;color:var(--text-muted);margin-top:3px;transition:color 0.2s;}
+  .agent-dre{font-size:10px;color:var(--text-muted);margin-top:3px;}
   .agent-card.selected .agent-dre{color:rgba(255,255,255,0.5);}
   .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
   .mode-card{border:2.5px solid var(--border);border-radius:12px;padding:24px 20px;cursor:pointer;transition:all 0.2s;background:var(--cream);position:relative;overflow:hidden;}
   .mode-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--border);transition:background 0.2s;}
   .mode-card:hover{background:var(--white);transform:translateY(-2px);box-shadow:var(--shadow);}
-  .mode-card.selected-disclosure{border-color:var(--disclosure);background:var(--white);box-shadow:0 4px 20px rgba(26,82,118,0.15);}
+  .mode-card.selected-disclosure{border-color:var(--disclosure);background:var(--white);}
   .mode-card.selected-disclosure::before{background:var(--disclosure);}
-  .mode-card.selected-condition{border-color:var(--condition);background:var(--white);box-shadow:0 4px 20px rgba(30,132,73,0.15);}
+  .mode-card.selected-condition{border-color:var(--condition);background:var(--white);}
   .mode-card.selected-condition::before{background:var(--condition);}
   .mode-icon{font-size:32px;margin-bottom:12px;}
   .mode-label{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px;}
   .mode-card.selected-disclosure .mode-label{color:var(--disclosure);}
   .mode-card.selected-condition .mode-label{color:var(--condition);}
   .mode-desc{font-size:12px;color:var(--text-muted);line-height:1.5;}
-  .mode-reads{margin-top:10px;font-size:11px;font-weight:600;letter-spacing:0.5px;color:var(--text-muted);}
+  .mode-reads{margin-top:10px;font-size:11px;font-weight:600;color:var(--text-muted);}
   .mode-card.selected-disclosure .mode-reads{color:var(--disclosure);}
   .mode-card.selected-condition .mode-reads{color:var(--condition);}
   .mode-badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border-radius:10px;margin-bottom:10px;}
@@ -63,76 +63,51 @@
   .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
   .form-group{display:flex;flex-direction:column;gap:6px;}
   label{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);}
-  input{font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--cream);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;width:100%;}
-  input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(15,31,61,0.08);background:var(--white);}
-  .drive-section{border:2px solid var(--border);border-radius:12px;padding:28px 24px;background:var(--cream);}
+  input,select{font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--cream);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;outline:none;transition:border-color 0.2s;width:100%;}
+  input:focus,select:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(15,31,61,0.08);background:var(--white);}
+  .drive-section{border:2px solid var(--border);border-radius:12px;padding:24px;background:var(--cream);margin-bottom:0;}
   .drive-section.mode-disclosure{border-color:rgba(26,82,118,0.3);background:rgba(26,82,118,0.03);}
   .drive-section.mode-condition{border-color:rgba(30,132,73,0.3);background:rgba(30,132,73,0.03);}
   .drive-section-title{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px;}
   .drive-section-hint{font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;}
   .drive-btn{display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:10px 22px;border-radius:8px;border:2px solid var(--border);background:var(--white);color:var(--navy);cursor:pointer;transition:all 0.2s;}
-  .drive-btn:hover{border-color:var(--navy);box-shadow:0 2px 8px rgba(15,31,61,0.10);}
-  .drive-btn.disclosure-btn:hover{border-color:var(--disclosure);color:var(--disclosure);}
-  .drive-btn.condition-btn:hover{border-color:var(--condition);color:var(--condition);}
-  .file-list{margin-top:16px;display:flex;flex-direction:column;gap:8px;}
-  .file-item{display:flex;align-items:center;gap:12px;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:10px 14px;animation:fadeIn 0.2s ease;}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
-  .file-icon{font-size:20px;flex-shrink:0;}
-  .file-info{flex:1;min-width:0;}
-  .file-name{font-size:13px;font-weight:600;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .file-size{font-size:11px;color:var(--text-muted);margin-top:1px;}
-  .file-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;flex-shrink:0;margin-right:4px;}
-  .file-badge.from-drive{background:rgba(66,133,244,0.1);color:#4285f4;}
-  .file-badge.auto-read{background:rgba(30,132,73,0.1);color:var(--condition);}
-  .file-status{font-size:11px;font-weight:600;padding:3px 8px;border-radius:10px;flex-shrink:0;}
-  .file-status.ready{background:rgba(42,125,79,0.1);color:var(--success);}
-  .file-remove{background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:18px;padding:2px 6px;border-radius:4px;transition:color 0.15s;flex-shrink:0;line-height:1;}
-  .file-remove:hover{color:var(--danger);}
-  .files-summary{margin-top:12px;font-size:12px;color:var(--text-muted);font-style:italic;}
-  .or-divider{display:flex;align-items:center;gap:12px;margin:16px 0;}
-  .or-divider div{flex:1;height:1px;background:var(--border);}
-  .or-divider span{font-size:11px;color:var(--text-muted);font-weight:600;letter-spacing:1px;}
-  .drop-zone{border:2px dashed var(--border);border-radius:10px;padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--white);position:relative;}
-  .drop-zone:hover{border-color:var(--navy);background:rgba(15,31,61,0.02);}
-  .drop-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-  .drop-zone-icon{font-size:28px;margin-bottom:8px;}
-  .drop-zone-text{font-size:13px;color:var(--text-muted);}
-  .generate-btn{width:100%;padding:17px;background:var(--navy);color:var(--white);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;letter-spacing:0.5px;cursor:pointer;transition:all 0.2s;}
-  .generate-btn:hover:not(:disabled){background:var(--navy-mid);box-shadow:var(--shadow-lg);transform:translateY(-1px);}
-  .generate-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
-  .generate-btn.btn-disclosure{background:var(--disclosure);}
-  .generate-btn.btn-disclosure:hover:not(:disabled){background:#154360;}
-  .generate-btn.btn-condition{background:var(--condition);}
-  .generate-btn.btn-condition:hover:not(:disabled){background:#186a3b;}
+  .drive-btn:hover{border-color:var(--navy);}
+  .drive-btn.selected{border-color:var(--success);background:rgba(42,125,79,0.05);color:var(--success);}
+  .folder-status{margin-top:10px;font-size:12px;color:var(--text-muted);font-style:italic;}
+  .submit-btn{width:100%;padding:17px;background:var(--navy);color:var(--white);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;letter-spacing:0.5px;cursor:pointer;transition:all 0.2s;}
+  .submit-btn:hover:not(:disabled){background:var(--navy-mid);box-shadow:var(--shadow-lg);transform:translateY(-1px);}
+  .submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+  .submit-btn.btn-disclosure{background:var(--disclosure);}
+  .submit-btn.btn-disclosure:hover:not(:disabled){background:#154360;}
+  .submit-btn.btn-condition{background:var(--condition);}
+  .submit-btn.btn-condition:hover:not(:disabled){background:#186a3b;}
   .status-bar{display:none;align-items:center;gap:12px;padding:14px 18px;border-radius:8px;margin-top:16px;font-size:13px;font-weight:500;}
   .status-bar.loading{display:flex;background:rgba(15,31,61,0.06);color:var(--navy);border:1px solid rgba(15,31,61,0.12);}
   .status-bar.error{display:flex;background:#fdf0ee;color:var(--danger);border:1px solid #f5c0bb;}
   .spinner{width:18px;height:18px;border:2.5px solid rgba(15,31,61,0.15);border-top-color:var(--navy);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
   @keyframes spin{to{transform:rotate(360deg);}}
-  #report-output{display:none;}
-  .report-header-bar{background:var(--navy);color:var(--white);border-radius:12px 12px 0 0;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
-  .report-header-bar.disclosure-header{background:var(--disclosure);}
-  .report-header-bar.condition-header{background:var(--condition);}
-  .report-header-bar h3{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;}
-  .report-header-bar h3 span{color:var(--gold-light);}
-  .report-actions{display:flex;gap:8px;flex-wrap:wrap;}
-  .action-btn{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;transition:all 0.15s;}
-  .btn-gold{background:var(--gold);color:var(--navy);}
-  .btn-gold:hover{background:var(--gold-light);}
-  .btn-outline{background:transparent;color:var(--white);border:1.5px solid rgba(255,255,255,0.3);}
-  .btn-outline:hover{background:rgba(255,255,255,0.1);}
-  .btn-green{background:var(--success);color:var(--white);}
-  .btn-green:hover{filter:brightness(1.1);}
-  .report-body-wrap{background:var(--white);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;padding:32px 36px;}
-  .report-body{font-size:14px;line-height:1.8;color:var(--text);white-space:pre-wrap;font-family:'DM Sans',sans-serif;}
-  .pabbly-status{display:none;margin-top:12px;padding:12px 16px;border-radius:8px;font-size:13px;font-weight:500;}
-  .pabbly-status.sending{display:flex;align-items:center;gap:10px;background:#eef4ff;color:#2255aa;border:1px solid #c0d4f5;}
-  .pabbly-status.sent{display:flex;align-items:center;gap:10px;background:#eef7f1;color:var(--success);border:1px solid #b8dfc8;}
-  .pabbly-status.failed{display:flex;align-items:center;gap:10px;background:#fdf0ee;color:var(--danger);border:1px solid #f5c0bb;}
-  .new-report-btn{margin-top:20px;background:transparent;border:2px solid var(--navy);color:var(--navy);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:10px 24px;border-radius:8px;cursor:pointer;transition:all 0.15s;}
-  .new-report-btn:hover{background:var(--navy);color:var(--white);}
+  .confirmation{display:none;background:var(--white);border-radius:12px;box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;margin-top:8px;}
+  .confirmation-header{padding:28px 32px;display:flex;align-items:center;gap:20px;}
+  .confirmation-header.disclosure-bg{background:var(--disclosure);}
+  .confirmation-header.condition-bg{background:var(--condition);}
+  .conf-icon{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+  .conf-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--white);}
+  .conf-sub{font-size:13px;color:rgba(255,255,255,0.7);margin-top:3px;}
+  .confirmation-body{padding:28px 32px;}
+  .conf-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+  .conf-item-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;}
+  .conf-item-value{font-size:14px;font-weight:600;color:var(--navy);}
+  .conf-note{background:var(--cream);border-radius:8px;padding:16px 20px;font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:20px;}
+  .conf-note strong{color:var(--navy);}
+  .conf-what{margin-bottom:20px;}
+  .conf-what-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;}
+  .conf-what ul{list-style:none;display:flex;flex-direction:column;gap:6px;}
+  .conf-what li{font-size:13px;color:var(--text-muted);padding-left:20px;position:relative;}
+  .conf-what li::before{content:'→';position:absolute;left:0;color:var(--gold);}
+  .reset-btn{background:transparent;border:2px solid var(--navy);color:var(--navy);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:10px 24px;border-radius:8px;cursor:pointer;transition:all 0.15s;}
+  .reset-btn:hover{background:var(--navy);color:var(--white);}
   .step-hidden{display:none;}
-  @media(max-width:600px){.mode-grid{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}.header-title{font-size:26px;}.report-body-wrap{padding:20px;}}
+  @media(max-width:600px){.mode-grid{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}.header-title{font-size:26px;}.conf-detail-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -145,10 +120,14 @@
   </div>
 </header>
 <main>
+
+  <!-- STEP 1: AGENT -->
   <div class="card">
     <div class="card-title"><span class="step-num">1</span> Select Agent</div>
     <div class="agent-grid" id="agentGrid"></div>
   </div>
+
+  <!-- STEP 2: MODE -->
   <div class="card">
     <div class="card-title"><span class="step-num">2</span> Select Report Type</div>
     <div class="mode-grid">
@@ -168,9 +147,11 @@
       </div>
     </div>
   </div>
+
+  <!-- STEP 3: PROPERTY & FOLDER -->
   <div class="card step-hidden" id="step3">
     <div class="card-title"><span class="step-num">3</span> Property & Seller</div>
-    <div class="form-row">
+    <div class="form-row" style="margin-bottom:16px;">
       <div class="form-group">
         <label>Property Address</label>
         <input type="text" id="propAddress" placeholder="e.g. 777 Lucky Ln, Roseville CA 95747" />
@@ -180,12 +161,11 @@
         <input type="text" id="sellerName" placeholder="e.g. Gracey Wixon" />
       </div>
     </div>
-  </div>
-  <div class="card step-hidden" id="step4">
-    <div class="card-title"><span class="step-num">4</span> <span id="step4Title">Upload Documents</span></div>
+
+    <!-- Drive folder picker -->
     <div class="drive-section" id="driveFolderSection">
-      <div class="drive-section-title" id="driveSectionTitle">Browse Google Drive</div>
-      <div class="drive-section-hint" id="driveSectionHint">Select your transaction folder and the tool will automatically read the relevant documents.</div>
+      <div class="drive-section-title" id="driveSectionTitle">Select Transaction Folder</div>
+      <div class="drive-section-hint" id="driveSectionHint">Select the client's transaction folder. Claude will read the documents server-side — no waiting in the browser.</div>
       <button class="drive-btn" id="driveFolderBtn" onclick="openDriveFolderPicker()">
         <svg width="16" height="16" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
           <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
@@ -197,62 +177,60 @@
         </svg>
         <span id="driveBtnText">Select Transaction Folder from Drive</span>
       </button>
-      <div id="folderStatus" style="margin-top:10px;font-size:12px;color:var(--text-muted);font-style:italic;"></div>
+      <div class="folder-status" id="folderStatus"></div>
     </div>
-    <div class="or-divider"><div></div><span>OR UPLOAD MANUALLY</span><div></div></div>
-    <div class="drop-zone" id="dropZone">
-      <input type="file" id="fileInput" multiple accept=".pdf,.docx,.doc,.txt" onchange="handleFiles(this.files)" />
-      <div class="drop-zone-icon">📂</div>
-      <div class="drop-zone-text">Drop files here or click to browse from your computer</div>
-    </div>
-    <div class="file-list" id="fileList"></div>
-    <div class="files-summary" id="filesSummary"></div>
   </div>
-  <div class="card step-hidden" id="step5">
-    <div class="card-title"><span class="step-num">5</span> Generate Report</div>
-    <button class="generate-btn" id="generateBtn" onclick="generateReport()">✦ Generate Smart Seller Protection Report™</button>
+
+  <!-- STEP 4: SUBMIT -->
+  <div class="card step-hidden" id="step4">
+    <div class="card-title"><span class="step-num">4</span> Generate Report</div>
+    <button class="submit-btn" id="submitBtn" onclick="submitReport()">✦ Generate Smart Seller Protection Report™</button>
     <div class="status-bar" id="statusBar">
       <div class="spinner"></div>
-      <span id="statusText">Uploading documents…</span>
+      <span id="statusText">Submitting…</span>
     </div>
   </div>
-  <div id="report-output">
-    <div class="report-header-bar" id="reportHeaderBar">
-      <h3>Smart Seller Protection <span>Report™</span></h3>
-      <div class="report-actions">
-        <button class="action-btn btn-gold" onclick="copyReport()">Copy Report</button>
-        <button class="action-btn btn-green" id="pabblyBtn" onclick="sendToPabbly()">Save to Google Drive</button>
-        <button class="action-btn btn-outline" onclick="printReport()">Print / PDF</button>
+
+  <!-- CONFIRMATION -->
+  <div class="confirmation" id="confirmation">
+    <div class="confirmation-header" id="confHeader">
+      <div class="conf-icon">✓</div>
+      <div>
+        <div class="conf-title">Report Submitted</div>
+        <div class="conf-sub">Claude is reading your documents now</div>
       </div>
     </div>
-    <div class="report-body-wrap"><div class="report-body" id="reportBody"></div></div>
-    <div class="pabbly-status" id="pabblyStatus"></div>
-    <button class="new-report-btn" onclick="resetForm()">← Start New Report</button>
+    <div class="confirmation-body">
+      <div class="conf-detail-grid">
+        <div><div class="conf-item-label">Property</div><div class="conf-item-value" id="confAddress">—</div></div>
+        <div><div class="conf-item-label">Seller</div><div class="conf-item-value" id="confSeller">—</div></div>
+        <div><div class="conf-item-label">Report Type</div><div class="conf-item-value" id="confMode">—</div></div>
+        <div><div class="conf-item-label">Est. Completion</div><div class="conf-item-value">3–5 minutes</div></div>
+      </div>
+      <div class="conf-note">
+        <strong>Your report is being generated.</strong> Claude is downloading and reading every PDF in the transaction folder server-side — no browser timeout, no size limits. The completed report will be saved to your Google Drive via Pabbly when ready.
+      </div>
+      <div class="conf-what">
+        <div class="conf-what-title">What Claude is reading right now</div>
+        <ul id="confFileList"></ul>
+      </div>
+      <button class="reset-btn" onclick="resetForm()">← Start New Report</button>
+    </div>
   </div>
+
 </main>
 <script>
 // ── CONFIG ──
-let OPENAI_API_KEY = '';
-const OPENAI_MODEL  = 'gpt-4o';
 const GOOGLE_API_KEY   = 'AIzaSyAZzMGptybfWqP_FS8df2t4qhVdO_VkoT0';
 const GOOGLE_CLIENT_ID = '96917389365-hclaoi15jmlq4uocga79p3dn2s17j6td.apps.googleusercontent.com';
 const DRIVE_SCOPE      = 'https://www.googleapis.com/auth/drive.readonly';
-const PABBLY_DISCLOSURE = '/.netlify/functions/send-to-pabbly-disclosure';
-const PABBLY_CONDITION  = '/.netlify/functions/send-to-pabbly-condition';
-
-(async () => {
-  try {
-    const res  = await fetch('/.netlify/functions/config');
-    const data = await res.json();
-    OPENAI_API_KEY = data.openaiKey || '';
-  } catch(e) { console.error('Could not load config:', e); }
-})();
 
 const AGENTS = [
   { name:'Samuel K. Zieour', dre:'01397303', initials:'SZ' },
   { name:'John P. Klein',    dre:'00994179', initials:'JK' },
 ];
-let selectedAgent=null, selectedMode=null, uploadedFiles=[], selectedFolder=null, generatedReport='', _assistantId=null;
+let selectedAgent=null, selectedMode=null;
+let selectedFolderId=null, selectedFolderName=null;
 let pickerApiLoaded=false, gapiInited=false, tokenClient=null, driveAccessToken=null, gapiReady=false, gsiReady=false;
 
 // ── GOOGLE INIT ──
@@ -276,13 +254,13 @@ function maybeInitTokenClient(){
 }
 
 // ── AGENT CARDS ──
-const grid=document.getElementById('agentGrid');
+const agentGrid=document.getElementById('agentGrid');
 AGENTS.forEach((agent,i)=>{
   const card=document.createElement('div');
   card.className='agent-card';
   card.innerHTML=`<div class="agent-initial">${agent.initials}</div><div class="agent-name">${agent.name}</div><div class="agent-dre">DRE #${agent.dre}</div>`;
   card.onclick=()=>{document.querySelectorAll('.agent-card').forEach(c=>c.classList.remove('selected'));card.classList.add('selected');selectedAgent=AGENTS[i];};
-  grid.appendChild(card);
+  agentGrid.appendChild(card);
 });
 
 // ── MODE ──
@@ -292,68 +270,27 @@ function selectMode(mode){
   document.getElementById('modeCondition').classList.remove('selected-disclosure','selected-condition');
   if(mode==='disclosure'){
     document.getElementById('modeDisclosure').classList.add('selected-disclosure');
-    document.getElementById('step4Title').textContent='Disclosure Documents';
     document.getElementById('driveSectionTitle').textContent='Select Transaction Folder — Auto-reads A2 Disclosures';
-    document.getElementById('driveSectionHint').textContent="Select the client's transaction folder and the tool will automatically find and read all documents in the A2. Disclosures & Reports subfolder.";
-    document.getElementById('driveBtnText').textContent='Select Transaction Folder from Drive';
+    document.getElementById('driveSectionHint').textContent="Select the client's transaction folder. Claude reads every document in the A2. Disclosures & Reports subfolder server-side.";
     document.getElementById('driveFolderSection').className='drive-section mode-disclosure';
-    document.getElementById('driveFolderBtn').className='drive-btn disclosure-btn';
-    document.getElementById('generateBtn').className='generate-btn btn-disclosure';
-    document.getElementById('generateBtn').textContent='✦ Generate Disclosure Review Report';
+    document.getElementById('submitBtn').className='submit-btn btn-disclosure';
+    document.getElementById('submitBtn').textContent='✦ Generate Disclosure Review Report';
   } else {
     document.getElementById('modeCondition').classList.add('selected-condition');
-    document.getElementById('step4Title').textContent='Inspection & Repair Documents';
     document.getElementById('driveSectionTitle').textContent='Select Transaction Folder — Auto-reads A3 Inspections';
-    document.getElementById('driveSectionHint').textContent="Select the client's transaction folder and the tool will automatically find and read all documents in the A3. Inspection Reports subfolder.";
-    document.getElementById('driveBtnText').textContent='Select Transaction Folder from Drive';
+    document.getElementById('driveSectionHint').textContent="Select the client's transaction folder. Claude reads every document in the A3. Inspection Reports subfolder server-side.";
     document.getElementById('driveFolderSection').className='drive-section mode-condition';
-    document.getElementById('driveFolderBtn').className='drive-btn condition-btn';
-    document.getElementById('generateBtn').className='generate-btn btn-condition';
-    document.getElementById('generateBtn').textContent='✦ Generate Condition Analysis Report';
+    document.getElementById('submitBtn').className='submit-btn btn-condition';
+    document.getElementById('submitBtn').textContent='✦ Generate Condition Analysis Report';
   }
-  ['step3','step4','step5'].forEach(id=>document.getElementById(id).classList.remove('step-hidden'));
-  uploadedFiles=[];selectedFolder=null;renderFileList();
+  selectedFolderId=null; selectedFolderName=null;
   document.getElementById('folderStatus').textContent='';
+  document.getElementById('driveFolderBtn').className='drive-btn';
+  document.getElementById('driveBtnText').textContent='Select Transaction Folder from Drive';
+  ['step3','step4'].forEach(id=>document.getElementById(id).classList.remove('step-hidden'));
 }
 
-// ── DRAG & DROP ──
-const dropZone=document.getElementById('dropZone');
-dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.style.borderColor='var(--navy)';});
-dropZone.addEventListener('dragleave',()=>{dropZone.style.borderColor='';});
-dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.style.borderColor='';handleFiles(e.dataTransfer.files);});
-
-// ── FILE HELPERS ──
-function getFileIcon(n){const e=n.toLowerCase().split('.').pop();return e==='pdf'?'📄':(e==='docx'||e==='doc'?'📝':'📎');}
-function formatSize(b){return b<1048576?(b/1024).toFixed(1)+' KB':(b/1048576).toFixed(1)+' MB';}
-
-async function handleFiles(fileList){
-  const skipped=[];
-  for(const file of Array.from(fileList)){
-    if(file.size===0){skipped.push(file.name+' (empty)');continue;}
-    if(uploadedFiles.find(f=>f.name===file.name&&f.file.size===file.size)) continue;
-    uploadedFiles.push({file,name:file.name,fromDrive:false});
-  }
-  if(skipped.length) alert('Skipped:\n'+skipped.join('\n'));
-  renderFileList();
-}
-function removeFile(i){uploadedFiles.splice(i,1);renderFileList();}
-function renderFileList(){
-  const list=document.getElementById('fileList'), summary=document.getElementById('filesSummary');
-  list.innerHTML=uploadedFiles.map((f,i)=>`
-    <div class="file-item">
-      <div class="file-icon">${getFileIcon(f.name)}</div>
-      <div class="file-info"><div class="file-name">${f.name}</div><div class="file-size">${formatSize(f.file.size)}</div></div>
-      ${f.fromDrive?'<span class="file-badge from-drive">Drive</span>':''}
-      ${f.autoRead?'<span class="file-badge auto-read">Auto</span>':''}
-      <span class="file-status ready">✓ Ready</span>
-      <button class="file-remove" onclick="removeFile(${i})">×</button>
-    </div>`).join('');
-  const dc=uploadedFiles.filter(f=>f.fromDrive||f.autoRead).length, lc=uploadedFiles.length-dc, parts=[];
-  if(dc>0) parts.push(dc+' from Drive'); if(lc>0) parts.push(lc+' from computer');
-  summary.textContent=uploadedFiles.length>0?uploadedFiles.length+' document'+(uploadedFiles.length>1?'s':'')+' ready'+(parts.length?' ('+parts.join(', ')+')':'')+' — will be uploaded directly to OpenAI for analysis.':'';
-}
-
-// ── GOOGLE DRIVE FOLDER PICKER ──
+// ── DRIVE PICKER ──
 function openDriveFolderPicker(){
   const s=document.getElementById('folderStatus');
   if(!gapiReady||!gsiReady){s.textContent='⏳ Loading Google Drive… please try again in a moment.';return;}
@@ -364,567 +301,98 @@ function openDriveFolderPicker(){
 }
 function showFolderPicker(){
   const view=new google.picker.DocsView(google.picker.ViewId.FOLDERS).setIncludeFolders(true).setSelectFolderEnabled(true).setOwnedByMe(true);
-  new google.picker.PickerBuilder().setAppId('96917389365').setOAuthToken(driveAccessToken).setDeveloperKey(GOOGLE_API_KEY).addView(view).setTitle('Select the client transaction folder').setCallback(folderPickerCallback).build().setVisible(true);
+  new google.picker.PickerBuilder().setAppId('96917389365').setOAuthToken(driveAccessToken).setDeveloperKey(GOOGLE_API_KEY).addView(view).setTitle('Select the client transaction folder').setCallback(pickerCallback).build().setVisible(true);
 }
-async function folderPickerCallback(data){
+function pickerCallback(data){
   if(data.action!==google.picker.Action.PICKED) return;
-  const folder=data.docs[0];selectedFolder={id:folder.id,name:folder.name};
-  document.getElementById('folderStatus').textContent=`📁 Selected: ${folder.name} — scanning for documents…`;
-  await readSubfolderFiles(folder.id,folder.name);
-}
-async function readSubfolderFiles(parentId,parentName){
-  const s=document.getElementById('folderStatus'), sub=selectedMode==='disclosure'?'A2':'A3';
-  try{
-    s.textContent=`📁 Finding Active Transaction folder…`;
-    const ar=await fetch(`https://www.googleapis.com/drive/v3/files?q='${parentId}' in parents and name contains '3. Active Transaction' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`,{headers:{Authorization:`Bearer ${driveAccessToken}`}});
-    const ad=await ar.json();
-    if(!ad.files||!ad.files.length){s.textContent=`⚠️ Could not find "3. Active Transaction" inside ${parentName}. Please upload manually.`;return;}
-    s.textContent=`📁 Finding ${sub} subfolder…`;
-    const sr=await fetch(`https://www.googleapis.com/drive/v3/files?q='${ad.files[0].id}' in parents and name contains '${sub}' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`,{headers:{Authorization:`Bearer ${driveAccessToken}`}});
-    const sd=await sr.json();
-    if(!sd.files||!sd.files.length){s.textContent=`⚠️ Could not find "${sub}" subfolder. Please upload manually.`;return;}
-    const sf=sd.files[0];
-    s.textContent=`📁 Reading files from ${sf.name}…`;
-    const fr=await fetch(`https://www.googleapis.com/drive/v3/files?q='${sf.id}' in parents and trashed=false and (mimeType='application/pdf' or mimeType='application/vnd.openxmlformats-officedocument.wordprocessingml.document')&fields=files(id,name,size,mimeType)&orderBy=name`,{headers:{Authorization:`Bearer ${driveAccessToken}`}});
-    const fd=await fr.json(); const driveFiles=fd.files||[];
-    if(!driveFiles.length){s.textContent=`⚠️ No PDFs found in ${sf.name}. Please upload manually.`;return;}
-    uploadedFiles=uploadedFiles.filter(f=>!f.autoRead);
-    let downloaded=0; const dlSkipped=[];
-    for(const df of driveFiles){
-      try{
-        s.textContent=`⬇️ Downloading ${df.name} (${downloaded+1} of ${driveFiles.length})…`;
-        const dlr=await fetch(`https://www.googleapis.com/drive/v3/files/${df.id}?alt=media`,{headers:{Authorization:`Bearer ${driveAccessToken}`}});
-        if(!dlr.ok){dlSkipped.push(df.name+' (download failed)');continue;}
-        const blob=await dlr.blob();
-        if(!blob.size){dlSkipped.push(df.name+' (empty)');continue;}
-        if(!uploadedFiles.find(f=>f.name===df.name)){
-          uploadedFiles.push({file:new File([blob],df.name,{type:df.mimeType}),name:df.name,fromDrive:true,autoRead:true});
-        }
-        downloaded++;
-      } catch(e){dlSkipped.push(df.name+' (error)');}
-    }
-    s.textContent=`✅ ${downloaded} file${downloaded!==1?'s':''} loaded from ${sf.name}${dlSkipped.length?' ('+dlSkipped.length+' skipped)':''}`;
-    renderFileList();
-    if(dlSkipped.length) alert('Could not download:\n'+dlSkipped.join('\n'));
-  } catch(e){s.textContent=`⚠️ Error: ${e.message}`;console.error(e);}
+  const folder=data.docs[0];
+  selectedFolderId=folder.id; selectedFolderName=folder.name;
+  document.getElementById('folderStatus').textContent=`✅ Selected: ${folder.name}`;
+  document.getElementById('driveFolderBtn').className='drive-btn selected';
+  document.getElementById('driveBtnText').textContent=folder.name;
 }
 
-// ── OPENAI HELPERS ──
-async function uploadFileToOpenAI(file, setStatus){
-  setStatus(`Uploading ${file.name} to OpenAI…`);
-  const form=new FormData();
-  form.append('file',file,file.name);
-  form.append('purpose','assistants');
-  const res=await fetch('https://api.openai.com/v1/files',{
-    method:'POST',
-    headers:{Authorization:`Bearer ${OPENAI_API_KEY}`},
-    body:form
-  });
-  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(`File upload failed for "${file.name}": ${e.error?.message||res.status}`);}
-  return (await res.json()).id;
-}
-
-async function createVectorStore(fileIds, setStatus){
-  setStatus('Indexing all documents…');
-  const vsRes=await fetch('https://api.openai.com/v1/vector_stores',{
-    method:'POST',
-    headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'Content-Type':'application/json','OpenAI-Beta':'assistants=v2'},
-    body:JSON.stringify({name:'sspr-docs',file_ids:fileIds})
-  });
-  if(!vsRes.ok){const e=await vsRes.json().catch(()=>({}));throw new Error(`Vector store failed: ${e.error?.message||vsRes.status}`);}
-  const vs=await vsRes.json(); const vsId=vs.id;
-  let attempts=0;
-  while(attempts<40){
-    await new Promise(r=>setTimeout(r,3000)); attempts++;
-    const pr=await fetch(`https://api.openai.com/v1/vector_stores/${vsId}`,{headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'OpenAI-Beta':'assistants=v2'}});
-    const pd=await pr.json(); const c=pd.file_counts;
-    setStatus(`Indexing documents… (${c.completed}/${c.total} indexed)`);
-    if(pd.status==='completed'||c.in_progress===0) break;
-  }
-  return vsId;
-}
-
-async function getOrCreateAssistant(vsId, systemPrompt){
-  if(_assistantId) return _assistantId;
-  const res=await fetch('https://api.openai.com/v1/assistants',{
-    method:'POST',
-    headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'Content-Type':'application/json','OpenAI-Beta':'assistants=v2'},
-    body:JSON.stringify({
-      name:'Smart Seller Protection Report Generator',
-      model:OPENAI_MODEL,
-      instructions:systemPrompt,
-      tools:[{type:'file_search'}],
-      tool_resources:{file_search:{vector_store_ids:[vsId]}}
-    })
-  });
-  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(`Assistant creation failed: ${e.error?.message||res.status}`);}
-  _assistantId=(await res.json()).id;
-  return _assistantId;
-}
-
-async function runAssistant(vsId, prompt, systemPrompt, setStatus){
-  setStatus('Analyzing all documents…');
-  const assistantId=await getOrCreateAssistant(vsId,systemPrompt);
-  const threadRes=await fetch('https://api.openai.com/v1/threads',{
-    method:'POST',
-    headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'Content-Type':'application/json','OpenAI-Beta':'assistants=v2'},
-    body:JSON.stringify({messages:[{role:'user',content:prompt}],tool_resources:{file_search:{vector_store_ids:[vsId]}}})
-  });
-  if(!threadRes.ok){const e=await threadRes.json().catch(()=>({}));throw new Error(`Thread failed: ${e.error?.message||threadRes.status}`);}
-  const thread=await threadRes.json();
-  const runRes=await fetch(`https://api.openai.com/v1/threads/${thread.id}/runs`,{
-    method:'POST',
-    headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'Content-Type':'application/json','OpenAI-Beta':'assistants=v2'},
-    body:JSON.stringify({assistant_id:assistantId,stream:false})
-  });
-  if(!runRes.ok){const e=await runRes.json().catch(()=>({}));throw new Error(`Run failed: ${e.error?.message||runRes.status}`);}
-  const run=await runRes.json();
-  let attempts=0;
-  while(attempts<60){
-    await new Promise(r=>setTimeout(r,4000)); attempts++;
-    const pr=await fetch(`https://api.openai.com/v1/threads/${thread.id}/runs/${run.id}`,{headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'OpenAI-Beta':'assistants=v2'}});
-    const pd=await pr.json();
-    if(pd.status==='completed') break;
-    if(['failed','cancelled','expired'].includes(pd.status)) throw new Error(`Run ${pd.status}: ${pd.last_error?.message||'unknown'}`);
-    setStatus(`Generating report… (${pd.status})`);
-  }
-  const msgRes=await fetch(`https://api.openai.com/v1/threads/${thread.id}/messages`,{headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'OpenAI-Beta':'assistants=v2'}});
-  const msgData=await msgRes.json();
-  const msg=msgData.data.find(m=>m.role==='assistant');
-  if(!msg) throw new Error('No response from assistant.');
-  return msg.content.filter(c=>c.type==='text').map(c=>c.text.value).join('').replace(/【\d+:\d+†[^】]*】/g,'');
-}
-
-async function cleanup(fileIds,vsId){
-  try{
-    if(vsId) await fetch(`https://api.openai.com/v1/vector_stores/${vsId}`,{method:'DELETE',headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'OpenAI-Beta':'assistants=v2'}});
-    for(const fid of fileIds) await fetch(`https://api.openai.com/v1/files/${fid}`,{method:'DELETE',headers:{Authorization:`Bearer ${OPENAI_API_KEY}`}});
-    if(_assistantId){
-      await fetch(`https://api.openai.com/v1/assistants/${_assistantId}`,{method:'DELETE',headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'OpenAI-Beta':'assistants=v2'}});
-      _assistantId=null;
-    }
-  } catch(e){console.warn('Cleanup error (non-fatal):',e);}
-}
-
-// ── GENERATE ──
-async function generateReport(){
-  if(!OPENAI_API_KEY){alert('Configuration not loaded yet — please wait a moment and try again.');return;}
+// ── SUBMIT ──
+async function submitReport(){
   if(!selectedAgent){alert('Please select an agent.');return;}
   if(!selectedMode){alert('Please select a report type.');return;}
   const address=document.getElementById('propAddress').value.trim();
   const seller=document.getElementById('sellerName').value.trim();
   if(!address||!seller){alert('Please enter property address and seller name.');return;}
-  if(!uploadedFiles.length){alert('Please add documents — either from Drive or upload manually.');return;}
+  if(!selectedFolderId){alert('Please select a transaction folder from Google Drive.');return;}
 
-  const btn=document.getElementById('generateBtn'), statusBar=document.getElementById('statusBar'), statusText=document.getElementById('statusText');
-  btn.disabled=true; document.getElementById('report-output').style.display='none'; statusBar.className='status-bar loading';
-  const setStatus=msg=>{statusText.textContent=msg;};
+  const btn=document.getElementById('submitBtn');
+  const statusBar=document.getElementById('statusBar');
+  const statusText=document.getElementById('statusText');
+  btn.disabled=true; statusBar.className='status-bar loading'; statusText.textContent='Submitting report request…';
+
   const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-  const uploadedFileIds=[]; let vsId=null;
-
-  // Build explicit file manifest to pass into the prompt
-  const fileManifest = uploadedFiles.map((f,i) => `${i+1}. ${f.name} (${formatSize(f.file.size)})`).join('\n');
-
-  try{
-    for(let i=0;i<uploadedFiles.length;i++){
-      const f=uploadedFiles[i];
-      setStatus(`Uploading file ${i+1} of ${uploadedFiles.length}: ${f.name}…`);
-      await new Promise(r=>setTimeout(r,30));
-      uploadedFileIds.push(await uploadFileToOpenAI(f.file,setStatus));
-    }
-
-    vsId=await createVectorStore(uploadedFileIds,setStatus);
-    _assistantId=null;
-
-    const systemPrompt = selectedMode==='disclosure' ? getDisclosureSystemPrompt() : getConditionSystemPrompt();
-    const userPrompt   = selectedMode==='disclosure'
-      ? buildDisclosurePrompt(address, seller, today, fileManifest)
-      : buildConditionPrompt(address, seller, today, fileManifest);
-
-    generatedReport=await runAssistant(vsId,userPrompt,systemPrompt,setStatus);
-
-    document.getElementById('reportBody').textContent=generatedReport;
-    document.getElementById('reportHeaderBar').className=selectedMode==='disclosure'?'report-header-bar disclosure-header':'report-header-bar condition-header';
-    document.getElementById('report-output').style.display='block';
-    statusBar.className='status-bar';
-    document.getElementById('report-output').scrollIntoView({behavior:'smooth',block:'start'});
-    cleanup(uploadedFileIds,vsId);
-
-  } catch(err){
-    statusBar.className='status-bar error';
-    statusText.textContent='Error: '+err.message;
-    console.error(err);
-    if(uploadedFileIds.length) cleanup(uploadedFileIds,vsId);
-  } finally {
-    btn.disabled=false;
-  }
-}
-
-// ── SYSTEM PROMPTS ──
-function getDisclosureSystemPrompt(){
-  return `You are a highly experienced California real estate advisor with 22 years as a listing agent and 18 years in construction. You protect sellers by identifying disclosure risks, gaps, and listing strategy.
-
-CRITICAL INSTRUCTION: You will be given a manifest of ALL uploaded files. You MUST search for and read EVERY file listed in that manifest before writing anything. Do not skip any file. Do not assume a file is missing — search for it by filename. Every file has been successfully uploaded and indexed.
-
-NHD RULES — CRITICAL:
-- Only report hazard zones that are actually checked YES or marked as applicable in the NHD document itself.
-- Do NOT assume or infer hazard types. Do NOT report seismic, flood, fire, or any other zone unless the NHD document explicitly indicates it applies to this property.
-- Quote the exact hazard zone language from the NHD checkboxes. If a zone is checked NO or Not Applicable, do not mention it as a risk.
-
-AVID RULES — CRITICAL:
-- AVID-LA (Listing Agent Visual Inspection) and AVID-BA (Buyer's Agent Visual Inspection) are observations made by real estate agents during a walkthrough — they are NOT professional inspections.
-- Do NOT treat AVID observations as confirmed structural, pest, or mechanical findings.
-- AVID items should be noted as "agent observed" and flagged only as items that may warrant follow-up by a licensed inspector — not as confirmed defects.
-- Never elevate an AVID observation to a High risk finding. AVID items are at most Moderate and typically Low concern.
-- Do not use language like "structural issues confirmed" or "pest infestation" based solely on AVID. Use language like "agent noted," "visual observation suggests," or "may warrant professional inspection."
-
-Plain text only. No markdown. No asterisks. No pound signs. No citation brackets like [1] or [2]. Use ALL CAPS for section headers.`;
-}
-
-function getConditionSystemPrompt(){
-  return `You are a highly experienced California real estate advisor with 22 years as a listing agent and 18 years in construction. You protect sellers during inspection and repair negotiation.
-
-CRITICAL INSTRUCTION: You will be given a manifest of ALL uploaded files. You MUST search for and read EVERY file listed in that manifest before writing anything. Do not skip any file. Do not assume a file is missing — search for it by filename. Every file has been successfully uploaded and indexed.
-
-NHD RULES — CRITICAL:
-- Only report hazard zones that are actually checked YES or marked as applicable in the NHD document itself.
-- Do NOT assume or infer hazard types. Do NOT report seismic, flood, fire, or any other zone unless the NHD document explicitly indicates it applies to this property.
-- Quote the exact hazard zone language from the NHD checkboxes.
-
-AVID RULES — CRITICAL:
-- AVID-LA and AVID-BA are agent visual observations — NOT professional inspection reports.
-- Do NOT treat AVID items as confirmed defects. Use language like "agent noted," "visual observation," or "may warrant professional inspection."
-- Never classify an AVID-only item as High concern. AVID items are at most Moderate and typically Low.
-- Professional inspection reports (home inspector, pest inspector, roof inspector, etc.) carry full weight and should be reported in detail.
-
-Plain text only. No markdown. No asterisks. No pound signs. No citation brackets like [1] or [2]. Use ALL CAPS for section headers.`;
-}
-
-// ── USER PROMPTS ──
-function buildDisclosurePrompt(address, seller, today, fileManifest){
-  return `You have been provided with the following ${uploadedFiles.length} disclosure documents for this transaction. ALL of these files are in your vector store — search for each one by name and read it completely before writing the report:
-
-${fileManifest}
-
-STEP 1 — Before writing the report, search for and confirm you have read each file above. Note what document type each file contains.
-
-STEP 2 — Generate the complete SMART SELLER PROTECTION REPORT™ using findings from ALL files above.
-
-Property Address: ${address}
-Seller Name: ${seller}
-Date: ${today}
-Prepared By: ${selectedAgent.name} | SZ Real Estate Group
-Agent License #: ${selectedAgent.dre}
-
-Output the complete report in this exact format:
-
-SMART SELLER PROTECTION REPORT™
-Listing Disclosure Review
-
-Property Address: ${address}
-Seller Name: ${seller}
-Date: ${today}
-Prepared By: ${selectedAgent.name} | SZ Real Estate Group
-Agent License #: ${selectedAgent.dre}
-
-----------------------------------------
-
-EXECUTIVE SUMMARY
-
-[Overview of disclosure package completeness, overall risk level, key concerns, and listing readiness. Reference specific findings from the actual documents.]
-
-Disclosure Package Status: [Complete / Incomplete / Needs Attention]
-Overall Risk Level: [Low / Moderate / Elevated]
-Listing Readiness: [Ready / Needs Work / Address Before Listing]
-
-----------------------------------------
-
-DOCUMENTS REVIEWED
-
-[List every file from the manifest above and what document type it contains and whether it is executed/signed]
-
-----------------------------------------
-
-DISCLOSURE COMPLETENESS CHECK
-
-TDS (Transfer Disclosure Statement): [Present and executed / Present unsigned / Missing]
-SPQ (Seller Property Questionnaire): [Present and executed / Present unsigned / Missing]
-NHD (Natural Hazard Disclosure): [Present and executed / Present unsigned / Missing]
-AVID-LA (Agent Visual Inspection): [Present and executed / Present unsigned / Missing]
-Preliminary Title Report: [Present / Missing]
-FIRPTA Affidavit: [Present and executed / Present unsigned / Missing]
-Other documents present: [list any additional docs found]
-Missing recommended disclosures: [list any truly missing items]
-
-----------------------------------------
-
-RISK FLAGS — ITEMS A BUYER'S AGENT WILL CHALLENGE
-
-[For each material risk found in the actual documents:]
-[FLAG TITLE IN ALL CAPS]
-Source: [exact filename]
-Risk Level: [Low / Moderate / High]
-Category: [Legal / Physical / Environmental / Title / Disclosure Gap]
-
-[Description — what is actually stated in the document, what a buyer's agent will say]
-
-Seller Recommendation:
-[Specific action — clarify, repair, disclose proactively, or price accordingly]
-
-----------------------------------------
-
-TITLE & OWNERSHIP REVIEW
-
-[From Preliminary Title Report if present: vesting, liens, easements, CC&Rs, encumbrances]
-
-----------------------------------------
-
-NATURAL HAZARD EXPOSURE
-
-[From NHD if present: flood zone, fire zone, seismic, liquefaction — insurance implications, disclosure obligations]
-
-----------------------------------------
-
-MISSING OR VAGUE DISCLOSURES
-
-[Any blank, vague, or contradictory seller responses found in the actual documents. Missing permits or documentation.]
-
-----------------------------------------
-
-PRE-LISTING RECOMMENDATIONS
-
-Priority 1 — Must Address Before Listing:
-[Specific items based on actual document findings]
-
-Priority 2 — Recommended:
-[list]
-
-Priority 3 — Optional:
-[list]
-
-----------------------------------------
-
-AGENT NOTES FOR LISTING CONSULTATION
-
-[Specific talking points based on actual findings. Objections to anticipate. Pricing impact. Days on market considerations.]
-
-----------------------------------------
-
-OVERALL LISTING READINESS
-
-Disclosure Package: [Complete / Needs Attention]
-Physical Condition: [Good / Fair / Needs Work]
-Title Status: [Clean / Issues to Resolve]
-Listing Risk: [Low / Moderate / Elevated]
-
-[3-4 sentences summarizing overall readiness and next steps based on actual document findings.]
-
-----------------------------------------
-
-BROKERAGE INFORMATION
-
-Brokerage: SZ Real Estate Group
-Broker License #: 02066500
-Agent: ${selectedAgent.name}
-Agent License #: ${selectedAgent.dre}
-
-This report was prepared for seller advisory purposes only and does not constitute legal advice. Agent verification required before listing.`;
-}
-
-function buildConditionPrompt(address, seller, today, fileManifest){
-  return `You have been provided with the following ${uploadedFiles.length} inspection and repair documents for this transaction. ALL of these files are in your vector store — search for each one by name and read it completely before writing the report:
-
-${fileManifest}
-
-STEP 1 — Before writing the report, search for and confirm you have read each file above.
-
-STEP 2 — Generate the complete SMART SELLER PROTECTION REPORT™ using findings from ALL files above.
-
-Property Address: ${address}
-Seller Name: ${seller}
-Date: ${today}
-Prepared By: ${selectedAgent.name} | SZ Real Estate Group
-Agent License #: ${selectedAgent.dre}
-
-SMART SELLER PROTECTION REPORT™
-In-Contract Condition Analysis
-
-Property Address: ${address}
-Seller Name: ${seller}
-Date: ${today}
-Prepared By: ${selectedAgent.name} | SZ Real Estate Group
-Agent License #: ${selectedAgent.dre}
-
-----------------------------------------
-
-EXECUTIVE SUMMARY
-
-[Overview of condition, inspection findings, RFR status, negotiation position based on actual documents.]
-
-Overall Condition: [Good / Fair / Needs Work]
-RFR Risk Level: [Low / Moderate / High]
-Negotiation Position: [Strong / Neutral / Challenging]
-
-----------------------------------------
-
-DOCUMENTS REVIEWED
-
-[List every file from the manifest and what it contains]
-
-----------------------------------------
-
-INSPECTION FINDINGS SUMMARY
-
-STRUCTURAL & FOUNDATION
-[Actual findings from inspection reports]
-
-ROOF
-[Actual findings]
-
-ELECTRICAL
-[Actual findings]
-
-PLUMBING
-[Actual findings]
-
-HVAC
-[Actual findings]
-
-PEST & WOOD DESTROYING ORGANISMS
-[Section I vs Section II actual findings]
-
-OTHER FINDINGS
-[Any other actual findings]
-
-----------------------------------------
-
-RFR ANALYSIS — ITEM BY ITEM
-
-[For each item in the actual Repair Request documents:]
-[ITEM NAME IN ALL CAPS]
-Buyer Requested: [exact text from RFR]
-Classification: [Legitimate / Aggressive / Unreasonable]
-Seller Recommendation: [Accept / Counter / Decline]
-Rationale: [why — based on inspection finding, market norms, liability]
-
-----------------------------------------
-
-NEGOTIATION STRATEGY
-
-Items to ACCEPT: [list with rationale based on actual findings]
-Items to COUNTER: [list with suggested counter-position]
-Items to DECLINE: [list with rationale]
-
-Overall Recommended Response: [Credit / Repairs / Combination / As-Is]
-Suggested Credit Amount: [range only, if applicable]
-
-----------------------------------------
-
-COE RISK ASSESSMENT
-
-[Actual items from documents that could jeopardize closing]
-
-----------------------------------------
-
-AGENT NOTES FOR SELLER CONVERSATION
-
-[How to present these specific findings. Where seller has leverage.]
-
-----------------------------------------
-
-OVERALL POSITION
-
-Inspection Results: [Better / As Expected / Worse than expected for age and price]
-RFR Reasonableness: [Reasonable / Slightly aggressive / Very aggressive]
-Recommended Action: [Accept as submitted / Counter / Decline and defend]
-
-[3-4 sentence summary based on actual document findings.]
-
-----------------------------------------
-
-BROKERAGE INFORMATION
-
-Brokerage: SZ Real Estate Group
-Broker License #: 02066500
-Agent: ${selectedAgent.name}
-Agent License #: ${selectedAgent.dre}
-
-This report was prepared for seller advisory purposes only and does not constitute legal advice. Agent verification required before COE.`;
-}
-
-// ── COPY / PRINT ──
-function copyReport(){
-  navigator.clipboard.writeText(generatedReport).then(()=>{
-    const b=event.target;b.textContent='Copied!';setTimeout(()=>b.textContent='Copy Report',2000);
-  });
-}
-function printReport(){
-  const w=window.open('','_blank');
-  w.document.write(`<html><head><title>Smart Seller Protection Report</title><style>body{font-family:Georgia,serif;font-size:13px;line-height:1.8;max-width:700px;margin:40px auto;color:#111;}pre{white-space:pre-wrap;font-family:Georgia,serif;}</style></head><body><pre>${generatedReport.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre></body></html>`);
-  w.document.close();w.print();
-}
-
-// ── SEND TO PABBLY ──
-async function sendToPabbly(){
-  const address=document.getElementById('propAddress').value.trim();
-  const seller=document.getElementById('sellerName').value.trim();
-  const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-  const ps=document.getElementById('pabblyStatus');
-  const url=selectedMode==='disclosure'?PABBLY_DISCLOSURE:PABBLY_CONDITION;
-
-  ps.className='pabbly-status sending';
-  ps.innerHTML='<div style="width:15px;height:15px;border:2px solid rgba(34,85,170,0.2);border-top-color:#2255aa;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;"></div>&nbsp;Sending to Google Drive via Pabbly…';
-
-  const streetOnly=address.split(/,|\s+(?:Sacramento|Rocklin|Elk Grove|Folsom|Roseville|Citrus Heights|Rancho Cordova)/i)[0].trim();
+  const webhookUrl=process.env?.PABBLY_DISCLOSURE_WEBHOOK||''; // resolved server-side
 
   const payload={
-    report_mode:    selectedMode,
-    property_address: address,
-    street_address:   streetOnly,
-    seller_name:      seller,
-    date:             today,
-    agent_name:       selectedAgent.name,
-    agent_dre:        selectedAgent.dre,
-    brokerage_name:   'SZ Real Estate Group',
-    report_body:      generatedReport
+    folderId:      selectedFolderId,
+    folderName:    selectedFolderName,
+    reportMode:    selectedMode,
+    address,
+    seller,
+    agentName:     selectedAgent.name,
+    agentDre:      selectedAgent.dre,
+    date:          today,
+    brokerageName: 'SZ Real Estate Group',
+    pabblyWebhook: selectedMode==='disclosure' ? 'PABBLY_DISCLOSURE' : 'PABBLY_CONDITION'
   };
 
-  console.log('Sending to Pabbly:', url, JSON.stringify(payload).substring(0,200));
-
   try{
-    const res = await fetch(url,{
+    const res=await fetch('/.netlify/functions/sspr-background',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(payload)
     });
-    console.log('Pabbly response status:', res.status);
-    const text = await res.text();
-    console.log('Pabbly response body:', text.substring(0,300));
 
-    ps.className='pabbly-status sent';
-    ps.innerHTML='✓ Sent to Pabbly — Google Doc will appear in your Drive folder shortly.';
-    document.getElementById('pabblyBtn').textContent='✓ Sent to Drive';
-    document.getElementById('pabblyBtn').disabled=true;
-  } catch(e){
-    console.error('Pabbly error:', e);
-    ps.className='pabbly-status failed';
-    ps.innerHTML='✗ Failed to reach Pabbly: '+e.message;
+    statusBar.className='status-bar';
+
+    if(res.status===202||res.ok){
+      // Show confirmation
+      document.getElementById('confAddress').textContent=address;
+      document.getElementById('confSeller').textContent=seller;
+      document.getElementById('confMode').textContent=selectedMode==='disclosure'?'Disclosure Review':'Condition Analysis';
+      document.getElementById('confHeader').className='confirmation-header '+(selectedMode==='disclosure'?'disclosure-bg':'condition-bg');
+
+      const listEl=document.getElementById('confFileList');
+      listEl.innerHTML='';
+      const items=selectedMode==='disclosure'
+        ?['TDS · SPQ · NHD · FIRPTA · Earthquake','AVID-LA · AVID-BA','Sacramento Disclosures & Disclaimers','SBSA · LPD · Disclosure Cover','All PDFs in A2. Disclosures & Reports']
+        :['Home Inspection Report','Pest Report','RFR / Repair Requests','AVID-BA','All PDFs in A3. Inspection Reports'];
+      items.forEach(item=>{const li=document.createElement('li');li.textContent=item;listEl.appendChild(li);});
+
+      document.getElementById('confirmation').style.display='block';
+      document.getElementById('confirmation').scrollIntoView({behavior:'smooth',block:'start'});
+    } else {
+      const err=await res.json().catch(()=>({error:`Server error ${res.status}`}));
+      throw new Error(err.error||`Server error ${res.status}`);
+    }
+  } catch(err){
+    statusBar.className='status-bar error';
+    statusText.textContent=err.message;
+    btn.disabled=false;
   }
 }
 
 // ── RESET ──
 function resetForm(){
   document.querySelectorAll('.agent-card').forEach(c=>c.classList.remove('selected'));
-  ['modeDisclosure','modeCondition'].forEach(id=>document.getElementById(id).classList.remove('selected-disclosure','selected-condition'));
-  selectedAgent=null;selectedMode=null;selectedFolder=null;uploadedFiles=[];generatedReport='';_assistantId=null;
-  ['propAddress','sellerName'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('fileList').innerHTML='';document.getElementById('filesSummary').textContent='';
-  document.getElementById('fileInput').value='';document.getElementById('folderStatus').textContent='';
-  ['step3','step4','step5'].forEach(id=>document.getElementById(id).classList.add('step-hidden'));
-  document.getElementById('report-output').style.display='none';
+  document.getElementById('modeDisclosure').classList.remove('selected-disclosure','selected-condition');
+  document.getElementById('modeCondition').classList.remove('selected-disclosure','selected-condition');
+  selectedAgent=null; selectedMode=null; selectedFolderId=null; selectedFolderName=null;
+  document.getElementById('propAddress').value='';
+  document.getElementById('sellerName').value='';
+  document.getElementById('folderStatus').textContent='';
+  document.getElementById('driveFolderBtn').className='drive-btn';
+  document.getElementById('driveBtnText').textContent='Select Transaction Folder from Drive';
+  ['step3','step4'].forEach(id=>document.getElementById(id).classList.add('step-hidden'));
+  document.getElementById('confirmation').style.display='none';
   document.getElementById('statusBar').className='status-bar';
-  document.getElementById('pabblyStatus').className='pabbly-status';
-  document.getElementById('pabblyBtn').textContent='Save to Google Drive';document.getElementById('pabblyBtn').disabled=false;
+  document.getElementById('submitBtn').disabled=false;
   window.scrollTo({top:0,behavior:'smooth'});
 }
 </script>
