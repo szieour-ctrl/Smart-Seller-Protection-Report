@@ -1,60 +1,20 @@
 /**
  * Smart Seller Protection Report™ — Netlify Background Function
- * File: netlify/functions/sspr-background.js
+ * netlify/functions/sspr-background.js
  *
- * Architecture:
- *  - Receives folder ID + metadata from browser
- *  - Downloads A2 (disclosure) or A3 (condition) PDFs via service account
- *  - Classifies files: READ (disclosure docs) vs INVENTORY (large reports)
- *  - Batches READ files in groups of 3 → Claude native PDF blocks
- *  - Extracts findings per group, synthesizes full SSPR report
- *  - Fires completed report to Pabbly webhook → Google Doc
+ * Finds client folder by lastName + "Listing 2026" in RE Transactions root
+ * Downloads A2 (disclosure) or A3 (condition) PDFs via service account
+ * Batches through Claude with native PDF blocks
+ * Fires completed report to Pabbly → Google Doc + email
  */
 
 const https = require('https');
 
-// ─── Config ───────────────────────────────────────────────────────────────────
-const PER_FILE_CAP_KB   = 6144;   // 6MB per file hard cap
-const GROUP_SIZE        = 3;      // files per Claude call
+const ROOT_FOLDER_ID  = '1iuTI1fKo4IZps9hzXLPFoI3TUT3NaCKI'; // RE Transactions 2026
+const PER_FILE_CAP_KB = 6144;  // 6MB per file
+const GROUP_SIZE      = 5;     // files per Claude call
 
-// ─── File classification ──────────────────────────────────────────────────────
-// Disclosure mode — always READ these
-const DISCLOSURE_READ_PATTERNS = [
-  /\btds\b/i, /transfer.?disclos/i,
-  /\bspq\b/i, /seller.?property.?quest/i,
-  /\bavid\b/i, /visual.?inspect/i,
-  /nhd.?signature/i, /nhd[-_]sig/i,
-  /\bsbsa\b/i, /statewide.?buyer/i,
-  /firpta/i, /earthquake/i, /\bwfda\b/i,
-  /disclosure.?cover/i, /sacto.?disclos/i,
-  /\blpd\b/i, /lead.?paint/i,
-  /\bsbsa\b/i, /disclosures.?disclaimers/i,
-];
-
-// Always INVENTORY these (large files — confirm present, don't read)
-const INVENTORY_PATTERNS = [
-  /nhd.?full/i, /nhd.?report/i,
-  /prelim/i, /preliminary.?title/i, /title.?report/i,
-  /inspection.?report/i, /home.?inspect/i,
-  /pest.?report/i, /termite.?report/i,
-  /roof.?inspect/i, /sewer/i, /chimney/i,
-];
-
-const SMALL_FILE_THRESHOLD_KB = 500; // Unknown files under 500KB → READ
-
-function classifyFile(filename, sizeKB) {
-  for (const p of INVENTORY_PATTERNS) {
-    if (p.test(filename)) return 'INVENTORY';
-  }
-  for (const p of DISCLOSURE_READ_PATTERNS) {
-    if (p.test(filename)) return 'READ';
-  }
-  if (sizeKB < SMALL_FILE_THRESHOLD_KB) return 'READ';
-  return 'READ'; // For SSPR, default to READ — these are all disclosure docs
-}
-
-// ─── Google Auth (Service Account JWT) ───────────────────────────────────────
-
+// ── Google Service Account Auth ───────────────────────────────────────────────
 function base64url(str) {
   return Buffer.from(str).toString('base64')
     .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
@@ -65,9 +25,9 @@ async function getGoogleAccessToken() {
   if (!rawKey) throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY not set');
   let key;
   try { key = JSON.parse(rawKey); }
-  catch (e) {
+  catch(e) {
     try { key = JSON.parse(rawKey.trim().replace(/^"|"$/g, '')); }
-    catch (e2) { throw new Error('Failed to parse GOOGLE_SERVICE_ACCOUNT_KEY'); }
+    catch(e2) { throw new Error('Failed to parse GOOGLE_SERVICE_ACCOUNT_KEY'); }
   }
   const privateKey = key.private_key.replace(/\\n/g, '\n');
   const now = Math.floor(Date.now() / 1000);
@@ -105,9 +65,8 @@ async function getGoogleAccessToken() {
   });
 }
 
-// ─── Drive helpers ────────────────────────────────────────────────────────────
-
-function driveRequest(path, token) {
+// ── Drive helpers ─────────────────────────────────────────────────────────────
+function driveGet(path, token) {
   return new Promise((resolve, reject) => {
     const req = https.request({
       hostname: 'www.googleapis.com', path, method: 'GET',
@@ -117,7 +76,7 @@ function driveRequest(path, token) {
       res.on('data', c => data += c);
       res.on('end', () => {
         try { resolve(JSON.parse(data)); }
-        catch (e) { resolve({ error: 'JSON parse failed', raw: data.substring(0, 200) }); }
+        catch(e) { resolve({ error: 'parse fail', raw: data.substring(0, 200) }); }
       });
     });
     req.on('error', reject);
@@ -125,10 +84,22 @@ function driveRequest(path, token) {
   });
 }
 
-async function listFolder(folderId, token) {
-  const q      = encodeURIComponent(`'${folderId}' in parents and trashed = false`);
-  const fields = encodeURIComponent('files(id,name,mimeType,size)');
-  const result = await driveRequest(`/drive/v3/files?q=${q}&fields=${fields}&pageSize=100`, token);
+async function searchFolder(parentId, nameContains, token) {
+  const q = encodeURIComponent(
+    `'${parentId}' in parents and name contains '${nameContains}' and mimeType='application/vnd.google-apps.folder' and trashed=false`
+  );
+  const result = await driveGet(`/drive/v3/files?q=${q}&fields=files(id,name)&pageSize=10`, token);
+  return result.files || [];
+}
+
+async function listPdfs(folderId, token) {
+  const q = encodeURIComponent(
+    `'${folderId}' in parents and trashed=false and (mimeType='application/pdf' or name contains '.pdf')`
+  );
+  const result = await driveGet(
+    `/drive/v3/files?q=${q}&fields=files(id,name,size,mimeType)&orderBy=name&pageSize=100`,
+    token
+  );
   return result.files || [];
 }
 
@@ -149,15 +120,19 @@ async function downloadBase64(fileId, token) {
   });
 }
 
-// ─── HTTP POST helper ─────────────────────────────────────────────────────────
-
+// ── HTTP POST helper ──────────────────────────────────────────────────────────
 function postJSON(urlString, payload) {
   return new Promise((resolve, reject) => {
     const body = JSON.stringify(payload);
     const url  = new URL(urlString);
     const req  = https.request({
-      hostname: url.hostname, path: url.pathname + url.search, method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) }
+      hostname: url.hostname,
+      path: url.pathname + url.search,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(body)
+      }
     }, res => {
       let data = '';
       res.on('data', c => data += c);
@@ -169,37 +144,34 @@ function postJSON(urlString, payload) {
   });
 }
 
-// ─── Claude API call with native PDF document blocks ─────────────────────────
-
+// ── Claude API — native PDF document blocks ───────────────────────────────────
 async function callClaude(files, promptText) {
   return new Promise((resolve, reject) => {
-    const messageContent = [];
-
-    // Attach each PDF as a native document block
+    const content = [];
     for (const f of files) {
       if (f.base64) {
-        messageContent.push({
+        content.push({
           type: 'document',
           source: { type: 'base64', media_type: 'application/pdf', data: f.base64 },
           title: f.filename
         });
       }
     }
-    messageContent.push({ type: 'text', text: promptText });
+    content.push({ type: 'text', text: promptText });
 
-    const requestBody = JSON.stringify({
+    const body = JSON.stringify({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 4000,
       system: `You are a highly experienced California real estate advisor with 22 years as a listing agent and 18 years in construction. You read actual transaction documents and extract precise findings.
 
-CRITICAL: Only report what you can directly read from the attached document content. Never fabricate, invent, or guess any information. If you cannot find something, say so explicitly.
+CRITICAL: Only report what you can directly read from the attached document content. Never fabricate or guess. If you cannot find something, say so explicitly.
 
-NHD RULE: Only report hazard zones that are literally checked YES or marked applicable in the NHD. Do not assume or infer any hazard type not explicitly indicated.
+NHD RULE: Only report hazard zones literally checked YES or marked applicable in the NHD document. Never assume any hazard type.
 
-AVID RULE: AVID-LA and AVID-BA are agent visual observations, NOT professional inspections. Use language like "agent noted" or "agent observed." Never classify an AVID item as High concern. AVID findings are observational only and may warrant professional follow-up.
+AVID RULE: AVID-LA and AVID-BA are agent visual observations, NOT professional inspections. Use language like "agent noted" or "agent observed." Never classify an AVID-only item as High concern.
 
-Plain text output only. No markdown. No asterisks. No pound signs.`,
-      messages: [{ role: 'user', content: messageContent }]
+Plain text only. No markdown. No asterisks. No pound signs.`,
+      messages: [{ role: 'user', content }]
     });
 
     const req = https.request({
@@ -210,7 +182,8 @@ Plain text output only. No markdown. No asterisks. No pound signs.`,
         'Content-Type': 'application/json',
         'x-api-key': process.env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'pdfs-2024-09-25'
+        'anthropic-beta': 'pdfs-2024-09-25',
+        'Content-Length': Buffer.byteLength(body)
       }
     }, res => {
       const chunks = [];
@@ -221,171 +194,202 @@ Plain text output only. No markdown. No asterisks. No pound signs.`,
           if (parsed.error) { resolve({ error: parsed.error.message, text: '' }); return; }
           const text = parsed.content?.filter(c => c.type === 'text').map(c => c.text).join('') || '';
           resolve({ text });
-        } catch (e) { resolve({ error: e.message, text: '' }); }
+        } catch(e) { resolve({ error: e.message, text: '' }); }
       });
     });
     req.on('error', err => resolve({ error: err.message, text: '' }));
-    req.write(requestBody);
+    req.write(body);
     req.end();
   });
 }
 
-// ─── Main handler ─────────────────────────────────────────────────────────────
+// ── Build disclosure flags from property conditions ───────────────────────────
+function buildConditionFlags(yearBuilt, hoa, pool, community55, wellSeptic) {
+  const flags = [];
+  const year = parseInt(yearBuilt);
+  if (year && year < 1978) flags.push('LEAD BASED PAINT DISCLOSURE REQUIRED (pre-1978 construction)');
+  if (year && year < 1994) flags.push('WATER HEATER BRACING DISCLOSURE — verify compliance (pre-1994)');
+  if (hoa === 'yes') flags.push('HOA DOCUMENTS REQUIRED — CC&Rs, bylaws, budget, meeting minutes, pending assessments');
+  if (pool === 'yes') flags.push('POOL/SPA SAFETY DISCLOSURE — drain cover compliance, fencing, permits');
+  if (community55 === 'yes') flags.push('55+ COMMUNITY — age verification disclosures and HOA rules required');
+  if (wellSeptic === 'yes') flags.push('WELL/SEPTIC — water quality test, septic inspection, permit verification required');
+  return flags.length > 0 ? '\n\nPROPERTY CONDITION FLAGS — VERIFY THESE DISCLOSURES ARE PRESENT:\n' + flags.join('\n') : '';
+}
 
+// ── Main handler ──────────────────────────────────────────────────────────────
 exports.handler = async (event) => {
   const body = JSON.parse(event.body || '{}');
   const {
-    folderId, folderName, reportMode,
-    address, seller, agentName, agentDre,
-    date, brokerageName, pabblyWebhook: pabblyKey
+    sellerLastName, address, yearBuilt,
+    reportMode, agentName, agentDre, date, brokerageName,
+    hoa, pool, community55, wellSeptic,
+    reportEmail
   } = body;
 
-  // Resolve webhook URL from env vars — never trust browser payload for this
-  const pabblyWebhook = pabblyKey === 'PABBLY_CONDITION'
+  const pabblyWebhook = reportMode === 'condition'
     ? (process.env.PABBLY_CONDITION_WEBHOOK || process.env.PABBLY_DISCLOSURE_WEBHOOK)
     : process.env.PABBLY_DISCLOSURE_WEBHOOK;
 
-  console.log(`[SSPR] Starting ${reportMode} report for: ${folderName}`);
+  const subfolderTarget = reportMode === 'disclosure' ? 'A2' : 'A3';
+  const conditionFlags  = buildConditionFlags(yearBuilt, hoa, pool, community55, wellSeptic);
 
-  const subfolderName = reportMode === 'disclosure' ? 'A2' : 'A3';
+  console.log(`[SSPR] Starting ${reportMode} report — Seller: ${sellerLastName} | ${address}`);
 
   try {
     // ── Google Auth ───────────────────────────────────────────────────────────
     const token = await getGoogleAccessToken();
     console.log('[SSPR] Google auth OK');
 
-    // ── Navigate to transaction folder → Active Transaction → A2 or A3 ───────
-    const parentContents = await listFolder(folderId, token);
-    const activeFolder = parentContents.find(f =>
-      f.name.includes('Active Transaction') && f.mimeType === 'application/vnd.google-apps.folder'
+    // ── Find client folder by lastName + "Listing 2026" ──────────────────────
+    console.log(`[SSPR] Searching for: ${sellerLastName} Listing`);
+    const clientFolders = await searchFolder(ROOT_FOLDER_ID, sellerLastName, token);
+    const clientFolder  = clientFolders.find(f =>
+      f.name.toLowerCase().includes(sellerLastName.toLowerCase()) &&
+      f.name.toLowerCase().includes('listing')
     );
-    if (!activeFolder) {
-      await postJSON(pabblyWebhook, { status: 'error', error: 'Active Transaction folder not found', address, seller, agentName });
+
+    if (!clientFolder) {
+      console.error(`[SSPR] Client folder not found for: ${sellerLastName}`);
+      await postJSON(pabblyWebhook, {
+        status: 'error',
+        error:  `No folder found matching "${sellerLastName} - Listing 2026" in RE Transactions 2026.`,
+        address, seller_name: sellerLastName, agent_name: agentName, date,
+        report_email: reportEmail
+      });
       return { statusCode: 202 };
     }
+    console.log(`[SSPR] Found client folder: ${clientFolder.name}`);
 
-    const activeContents = await listFolder(activeFolder.id, token);
-    const subFolder = activeContents.find(f =>
-      f.name.includes(subfolderName) && f.mimeType === 'application/vnd.google-apps.folder'
-    );
-    if (!subFolder) {
-      await postJSON(pabblyWebhook, { status: 'error', error: `${subfolderName} subfolder not found`, address, seller, agentName });
+    // ── Navigate to 3. Active Transaction ────────────────────────────────────
+    const activeFolders = await searchFolder(clientFolder.id, 'Active Transaction', token);
+    if (!activeFolders.length) {
+      await postJSON(pabblyWebhook, {
+        status: 'error', error: '"3. Active Transaction" folder not found.',
+        address, seller_name: sellerLastName, agent_name: agentName, date,
+        report_email: reportEmail
+      });
       return { statusCode: 202 };
     }
+    const activeFolder = activeFolders[0];
+    console.log(`[SSPR] Found: ${activeFolder.name}`);
 
-    console.log(`[SSPR] Found subfolder: ${subFolder.name}`);
+    // ── Navigate to A2 or A3 ─────────────────────────────────────────────────
+    const subFolders = await searchFolder(activeFolder.id, subfolderTarget, token);
+    if (!subFolders.length) {
+      await postJSON(pabblyWebhook, {
+        status: 'error', error: `"${subfolderTarget}" subfolder not found.`,
+        address, seller_name: sellerLastName, agent_name: agentName, date,
+        report_email: reportEmail
+      });
+      return { statusCode: 202 };
+    }
+    const subFolder = subFolders[0];
+    console.log(`[SSPR] Found: ${subFolder.name}`);
 
-    // ── List all PDFs in subfolder ────────────────────────────────────────────
-    const allItems = await listFolder(subFolder.id, token);
-    const pdfFiles = allItems.filter(f =>
-      (f.mimeType === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')) &&
-      f.mimeType !== 'application/vnd.google-apps.folder'
-    );
-
+    // ── List PDFs ─────────────────────────────────────────────────────────────
+    const pdfFiles = await listPdfs(subFolder.id, token);
     if (!pdfFiles.length) {
-      await postJSON(pabblyWebhook, { status: 'error', error: `No PDFs found in ${subFolder.name}`, address, seller, agentName });
+      await postJSON(pabblyWebhook, {
+        status: 'error', error: `No PDFs found in ${subFolder.name}.`,
+        address, seller_name: sellerLastName, agent_name: agentName, date,
+        report_email: reportEmail
+      });
       return { statusCode: 202 };
     }
+    console.log(`[SSPR] Found ${pdfFiles.length} PDFs`);
 
-    // ── Classify and download READ files ─────────────────────────────────────
-    const readFiles = [];
+    // ── Download files under cap ──────────────────────────────────────────────
+    const readFiles      = [];
     const inventoryFiles = [];
 
     for (const file of pdfFiles) {
-      const sizeKB = parseInt(file.size || 0) / 1024;
-      if (sizeKB === 0) { console.log(`[SSPR] Skipped 0KB: ${file.name}`); continue; }
+      const sizeKB = Math.round(parseInt(file.size || 0) / 1024);
+      if (sizeKB === 0) continue;
 
-      const classification = classifyFile(file.name, sizeKB);
-
-      if (classification === 'INVENTORY' || sizeKB > PER_FILE_CAP_KB) {
-        inventoryFiles.push({ filename: file.name, sizeKB: Math.round(sizeKB) });
-        console.log(`[SSPR] INVENTORY: ${file.name} (${Math.round(sizeKB)}KB)`);
+      if (sizeKB > PER_FILE_CAP_KB) {
+        inventoryFiles.push({ filename: file.name, sizeKB });
+        console.log(`[SSPR] Too large, inventory only: ${file.name} (${sizeKB}KB)`);
         continue;
       }
-
       try {
         const base64 = await downloadBase64(file.id, token);
-        readFiles.push({ filename: file.name, sizeKB: Math.round(sizeKB), base64 });
-        console.log(`[SSPR] Downloaded: ${file.name} (${Math.round(sizeKB)}KB)`);
-      } catch (err) {
-        inventoryFiles.push({ filename: file.name, sizeKB: Math.round(sizeKB), error: err.message });
-        console.log(`[SSPR] Download failed: ${file.name} — ${err.message}`);
+        readFiles.push({ filename: file.name, sizeKB, base64 });
+        console.log(`[SSPR] Downloaded: ${file.name} (${sizeKB}KB)`);
+      } catch(err) {
+        inventoryFiles.push({ filename: file.name, sizeKB, error: err.message });
       }
     }
 
     console.log(`[SSPR] READ: ${readFiles.length} | INVENTORY: ${inventoryFiles.length}`);
 
-    // ── Batch process READ files through Claude ───────────────────────────────
+    // ── Batch through Claude ──────────────────────────────────────────────────
     const groups = [];
     for (let i = 0; i < readFiles.length; i += GROUP_SIZE) {
       groups.push(readFiles.slice(i, i + GROUP_SIZE));
     }
 
     const allFindings = [];
-    const allFileNames = [...readFiles.map(f => f.filename), ...inventoryFiles.map(f => f.filename)];
+    const allFileNames = [
+      ...readFiles.map(f => f.filename),
+      ...inventoryFiles.map(f => f.filename)
+    ];
 
     for (let g = 0; g < groups.length; g++) {
       const group = groups[g];
-      const pauseMs = g === 0 ? 5000 : 45000; // Rate limit protection
-      console.log(`[SSPR] Group ${g + 1}/${groups.length}: pausing ${pauseMs / 1000}s…`);
-      await new Promise(r => setTimeout(r, pauseMs));
+      await new Promise(r => setTimeout(r, g === 0 ? 2000 : 5000));
+      console.log(`[SSPR] Calling Claude — group ${g + 1}/${groups.length}`);
 
-      const fileList = group.map(f => `• ${f.filename} (${f.sizeKB}KB)`).join('\n');
-      const otherFiles = allFileNames.filter(n => !group.find(f => f.filename === n));
-      const invList = inventoryFiles.map(f => `• ${f.filename}`).join('\n');
+      const invList  = inventoryFiles.map(f => `• ${f.filename} (${f.sizeKB}KB — too large, confirm by filename)`).join('\n');
+      const otherNames = allFileNames.filter(n => !group.find(f => f.filename === n));
 
-      const groupPrompt = `DOCUMENT GROUP ${g + 1} OF ${groups.length} — READ EVERY DOCUMENT ATTACHED
+      const groupPrompt =
+`DOCUMENT GROUP ${g + 1} OF ${groups.length} — READ EVERY ATTACHED PDF COMPLETELY
 
-Files in this group (attached as PDFs above):
-${fileList}
+Files attached in this group:
+${group.map(f => `• ${f.filename} (${f.sizeKB}KB)`).join('\n')}
+${inventoryFiles.length ? `\nPresent by filename only (too large to attach):\n${invList}` : ''}
+${otherNames.length ? `\nProcessed in other groups: ${otherNames.join(', ')}` : ''}
+${conditionFlags}
 
-${inventoryFiles.length > 0 ? `Also present in the transaction folder but NOT attached in this group (too large to read — confirm by filename only):\n${invList}` : ''}
-${otherFiles.length > 0 ? `\nOther files being processed in separate groups: ${otherFiles.join(', ')}` : ''}
-
-Read every attached document completely. Extract all relevant findings including:
-- Document type and execution status (signed/unsigned/initialed)
-- Party names as they appear in the document
-- Property address as it appears
-- Key disclosures, conditions, hazard zones, known defects
-- Any flags a buyer's agent would challenge
+Read every attached document completely — every page, every section, every checkbox.
+Extract all relevant findings:
+- Document type and full execution status (signed/unsigned/initialed by whom)
+- Property address as it appears in the document
+- Party names exactly as written
+- All disclosures, known defects, conditions, hazard zones
 - Any vague, blank, or contradictory sections
+- Any flags a buyer's agent would challenge
 
-For NHD documents: Only report hazard zones that are explicitly checked YES or marked applicable. Quote the exact checkbox language.
-For AVID documents: Note all agent observations but label them as "agent observed" and note they are not professional inspection findings.
+NHD: Quote exact checkbox language — only report zones marked YES or applicable.
+AVID: Label all findings as "agent observed" — these are not professional inspection findings.
 
-Be specific and thorough. Quote exact language where relevant. This will be used to build a complete seller advisory report.`;
+Be specific and thorough. Quote exact document language where relevant.`;
 
-      console.log(`[SSPR] Calling Claude for group ${g + 1}: ${group.map(f => f.filename).join(', ')}`);
       const result = await callClaude(group, groupPrompt);
-
       if (result.error) {
         console.error(`[SSPR] Group ${g + 1} error: ${result.error}`);
         allFindings.push(`[GROUP ${g + 1} ERROR: ${result.error}]`);
       } else {
         console.log(`[SSPR] Group ${g + 1} complete — ${result.text.length} chars`);
-        allFindings.push(`=== GROUP ${g + 1} FINDINGS (${group.map(f => f.filename).join(', ')}) ===\n${result.text}`);
+        allFindings.push(`=== GROUP ${g + 1} (${group.map(f => f.filename).join(', ')}) ===\n${result.text}`);
       }
     }
 
     // ── Synthesize final report ───────────────────────────────────────────────
-    console.log('[SSPR] Synthesizing final report…');
-    await new Promise(r => setTimeout(r, 5000));
+    console.log('[SSPR] Synthesizing…');
+    await new Promise(r => setTimeout(r, 2000));
 
-    const reportType   = reportMode === 'disclosure' ? 'Listing Disclosure Review' : 'In-Contract Condition Analysis';
-    const combinedFindings = allFindings.join('\n\n');
-
-    const inventorySection = inventoryFiles.length > 0
-      ? `\n\nFILES PRESENT BY FILENAME (too large to read — confirm by filename):\n${inventoryFiles.map(f => `• ${f.filename} (${f.sizeKB}KB)`).join('\n')}`
+    const invSection = inventoryFiles.length
+      ? `\nFILES CONFIRMED PRESENT BY FILENAME (too large to read):\n${inventoryFiles.map(f => `• ${f.filename}`).join('\n')}`
       : '';
 
     const synthesisPrompt = reportMode === 'disclosure'
-      ? buildDisclosureSynthesisPrompt(address, seller, agentName, agentDre, date, brokerageName, combinedFindings, inventorySection, allFileNames)
-      : buildConditionSynthesisPrompt(address, seller, agentName, agentDre, date, brokerageName, combinedFindings, inventorySection, allFileNames);
+      ? buildDisclosurePrompt(address, sellerLastName, agentName, agentDre, date, brokerageName, allFindings.join('\n\n'), invSection, allFileNames, conditionFlags, yearBuilt, hoa, pool, community55, wellSeptic)
+      : buildConditionPrompt(address, sellerLastName, agentName, agentDre, date, brokerageName, allFindings.join('\n\n'), invSection, allFileNames);
 
     const synthesis = await callClaude([], synthesisPrompt);
-
     const reportBody = synthesis.error
-      ? `ERROR DURING SYNTHESIS: ${synthesis.error}\n\nRAW FINDINGS:\n${combinedFindings}`
+      ? `SYNTHESIS ERROR: ${synthesis.error}\n\nRAW FINDINGS:\n${allFindings.join('\n\n')}`
       : synthesis.text;
 
     // ── Fire Pabbly ───────────────────────────────────────────────────────────
@@ -396,14 +400,15 @@ Be specific and thorough. Quote exact language where relevant. This will be used
       report_mode:      reportMode,
       property_address: address,
       street_address:   streetOnly,
-      seller_name:      seller,
+      seller_name:      sellerLastName,
       date,
       agent_name:       agentName,
       agent_dre:        agentDre,
       brokerage_name:   brokerageName,
-      folder_id:        folderId,
-      folder_name:      folderName,
+      folder_id:        clientFolder.id,
+      folder_name:      clientFolder.name,
       report_body:      reportBody,
+      report_email:     reportEmail,
       files_read:       readFiles.length,
       files_inventory:  inventoryFiles.length
     });
@@ -411,31 +416,40 @@ Be specific and thorough. Quote exact language where relevant. This will be used
     console.log('[SSPR] Complete — Pabbly fired');
     return { statusCode: 202 };
 
-  } catch (err) {
-    console.error('[SSPR] Fatal error:', err.message);
+  } catch(err) {
+    console.error('[SSPR] Fatal:', err.message);
     try {
       await postJSON(pabblyWebhook, {
         status: 'error', error: err.message,
-        address, seller, agentName, date
+        address, seller_name: sellerLastName,
+        agent_name: agentName, date, report_email: reportEmail
       });
-    } catch (e) {}
+    } catch(e) {}
     return { statusCode: 202 };
   }
 };
 
-// ─── Synthesis prompts ────────────────────────────────────────────────────────
+// ── Synthesis prompts ─────────────────────────────────────────────────────────
 
-function buildDisclosureSynthesisPrompt(address, seller, agentName, agentDre, date, brokerage, findings, inventorySection, allFiles) {
-  return `You are synthesizing a complete SMART SELLER PROTECTION REPORT™ from document findings extracted in the previous steps.
+function buildDisclosurePrompt(address, seller, agentName, agentDre, date, brokerage, findings, invSection, allFiles, conditionFlags, yearBuilt, hoa, pool, community55, wellSeptic) {
+  const year = parseInt(yearBuilt);
+  const lbpRequired = year && year < 1978;
+  return `Synthesize a complete SMART SELLER PROTECTION REPORT™ using ONLY the findings below. Never invent content.
 
 FINDINGS FROM ALL DOCUMENT GROUPS:
 ${findings}
-${inventorySection}
+${invSection}
 
 ALL FILES IN THIS TRANSACTION:
 ${allFiles.map(f => `• ${f}`).join('\n')}
 
-Using ONLY the findings above (do not invent anything), generate the complete report below. Every section must be based on actual findings from the documents. If a section has nothing to report, say "Nothing to report" — do not fabricate content.
+PROPERTY CONDITIONS ENTERED BY AGENT:
+Year Built: ${yearBuilt || 'Not provided'}
+HOA Present: ${hoa}
+Pool/Spa: ${pool}
+55+ Community: ${community55}
+Well/Septic: ${wellSeptic}
+${conditionFlags}
 
 SMART SELLER PROTECTION REPORT™
 Listing Disclosure Review
@@ -450,7 +464,7 @@ Agent License #: ${agentDre}
 
 EXECUTIVE SUMMARY
 
-[Based on actual findings: overview of disclosure package completeness, risk level, key concerns, listing readiness]
+[Based on actual findings — overview of disclosure package completeness, risk level, key concerns, listing readiness]
 
 Disclosure Package Status: [Complete / Incomplete / Needs Attention]
 Overall Risk Level: [Low / Moderate / Elevated]
@@ -460,32 +474,37 @@ Listing Readiness: [Ready / Needs Work / Address Before Listing]
 
 DOCUMENTS REVIEWED
 
-[List every document from the findings above with its type and execution status as found]
+[List every document with type and execution status as found in the actual documents]
 
 ----------------------------------------
 
 DISCLOSURE COMPLETENESS CHECK
 
-TDS (Transfer Disclosure Statement): [status from actual findings]
-SPQ (Seller Property Questionnaire): [status from actual findings]
-NHD (Natural Hazard Disclosure): [status from actual findings]
-AVID-LA (Agent Visual Inspection): [status from actual findings]
-Preliminary Title Report: [status from actual findings]
-FIRPTA Affidavit: [status from actual findings]
-Other documents present: [from actual findings]
-Missing recommended disclosures: [only items confirmed missing from actual findings]
+TDS (Transfer Disclosure Statement): [status from findings]
+SPQ (Seller Property Questionnaire): [status from findings]
+NHD (Natural Hazard Disclosure): [status from findings]
+AVID-LA (Agent Visual Inspection): [status from findings]
+Preliminary Title Report: [status from findings]
+FIRPTA Affidavit: [status from findings]
+${lbpRequired ? 'Lead Based Paint Disclosure (REQUIRED — pre-1978): [status from findings]' : ''}
+${hoa === 'yes' ? 'HOA Documents (REQUIRED): [status from findings]' : ''}
+${pool === 'yes' ? 'Pool/Spa Disclosure (REQUIRED): [status from findings]' : ''}
+${community55 === 'yes' ? '55+ Community Disclosures (REQUIRED): [status from findings]' : ''}
+${wellSeptic === 'yes' ? 'Well/Septic Disclosure (REQUIRED): [status from findings]' : ''}
+Other documents present: [from findings]
+Missing recommended disclosures: [only items confirmed missing]
 
 ----------------------------------------
 
 RISK FLAGS — ITEMS A BUYER'S AGENT WILL CHALLENGE
 
-[For each material risk from actual document findings — do not include AVID observations as High risk:]
+[For each material risk from actual findings. AVID items max Moderate risk:]
 [FLAG TITLE IN ALL CAPS]
-Source: [exact filename from findings]
+Source: [exact filename]
 Risk Level: [Low / Moderate / High]
 Category: [Legal / Physical / Environmental / Title / Disclosure Gap]
 
-[Description from actual findings]
+[Description from actual document findings]
 
 Seller Recommendation:
 [Specific action]
@@ -494,26 +513,26 @@ Seller Recommendation:
 
 TITLE & OWNERSHIP REVIEW
 
-[From Preliminary Title Report findings if present. If not present: note it is missing and recommend obtaining before listing.]
+[From Preliminary Title Report findings if present. If missing, note it and recommend obtaining before listing.]
 
 ----------------------------------------
 
 NATURAL HAZARD EXPOSURE
 
-[From NHD findings — only report hazard zones explicitly marked applicable in the document. If flooding is indicated, report flooding. If seismic is not indicated, do not mention seismic.]
+[From NHD findings only — report ONLY hazard zones explicitly marked applicable. Do not mention zones marked not applicable.]
 
 ----------------------------------------
 
 MISSING OR VAGUE DISCLOSURES
 
-[Items from actual findings that are blank, vague, or contradictory]
+[Items from actual findings that are blank, vague, or contradictory. Missing permits.]
 
 ----------------------------------------
 
 PRE-LISTING RECOMMENDATIONS
 
 Priority 1 — Must Address Before Listing:
-[From actual findings]
+[From actual findings plus any required disclosures for property conditions]
 
 Priority 2 — Recommended:
 [From actual findings]
@@ -525,7 +544,7 @@ Priority 3 — Optional:
 
 AGENT NOTES FOR LISTING CONSULTATION
 
-[Specific talking points based on actual findings. Pricing impact. Days on market considerations.]
+[Specific talking points from actual findings. Pricing impact. Days on market considerations.]
 
 ----------------------------------------
 
@@ -536,7 +555,7 @@ Physical Condition: [Good / Fair / Needs Work]
 Title Status: [Clean / Issues to Resolve]
 Listing Risk: [Low / Moderate / Elevated]
 
-[3-4 sentence summary based on actual findings]
+[3-4 sentence summary from actual findings]
 
 ----------------------------------------
 
@@ -550,17 +569,15 @@ Agent License #: ${agentDre}
 This report was prepared for seller advisory purposes only and does not constitute legal advice. Agent verification required before listing.`;
 }
 
-function buildConditionSynthesisPrompt(address, seller, agentName, agentDre, date, brokerage, findings, inventorySection, allFiles) {
-  return `You are synthesizing a complete SMART SELLER PROTECTION REPORT™ — Condition Analysis from document findings extracted in the previous steps.
+function buildConditionPrompt(address, seller, agentName, agentDre, date, brokerage, findings, invSection, allFiles) {
+  return `Synthesize a complete SMART SELLER PROTECTION REPORT™ — Condition Analysis using ONLY the findings below. Never invent content.
 
 FINDINGS FROM ALL DOCUMENT GROUPS:
 ${findings}
-${inventorySection}
+${invSection}
 
 ALL FILES IN THIS TRANSACTION:
 ${allFiles.map(f => `• ${f}`).join('\n')}
-
-Using ONLY the findings above, generate the complete report below. Every section must be based on actual document findings.
 
 SMART SELLER PROTECTION REPORT™
 In-Contract Condition Analysis
@@ -575,7 +592,7 @@ Agent License #: ${agentDre}
 
 EXECUTIVE SUMMARY
 
-[From actual findings: condition overview, RFR status, negotiation position]
+[From actual findings — condition overview, RFR status, negotiation position]
 
 Overall Condition: [Good / Fair / Needs Work]
 RFR Risk Level: [Low / Moderate / High]
@@ -585,14 +602,14 @@ Negotiation Position: [Strong / Neutral / Challenging]
 
 DOCUMENTS REVIEWED
 
-[List every document from findings with type and date/inspector if found]
+[List every document with type and inspector/date from findings]
 
 ----------------------------------------
 
 INSPECTION FINDINGS SUMMARY
 
 STRUCTURAL & FOUNDATION
-[From actual inspection report findings]
+[From actual inspection findings]
 
 ROOF
 [From actual findings]
@@ -616,7 +633,7 @@ OTHER FINDINGS
 
 RFR ANALYSIS — ITEM BY ITEM
 
-[For each RFR item found in documents:]
+[For each RFR item from actual documents:]
 [ITEM NAME IN ALL CAPS]
 Buyer Requested: [exact text from RFR]
 Classification: [Legitimate / Aggressive / Unreasonable]
@@ -627,7 +644,7 @@ Rationale: [based on actual findings]
 
 NEGOTIATION STRATEGY
 
-Items to ACCEPT: [with rationale from findings]
+Items to ACCEPT: [with rationale]
 Items to COUNTER: [with counter-position]
 Items to DECLINE: [with rationale]
 
