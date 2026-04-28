@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Smart Seller Protection Report™</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://apis.google.com/js/api.js" async defer onload="onGapiLoad()"></script>
+<script src="https://accounts.google.com/gsi/client" async defer onload="onGsiLoad()"></script>
 <style>
   :root {
-    --navy:#0f1f3d;--navy-mid:#1a3260;--navy-light:#243d6e;
-    --gold:#c8a84b;--gold-light:#e8c96a;
+    --navy:#0f1f3d;--navy-mid:#1a3260;--gold:#c8a84b;--gold-light:#e8c96a;
     --cream:#f7f3ec;--text:#1a1a1a;--text-muted:#5a5a5a;
     --success:#2a7d4f;--danger:#c0392b;--border:#d4c9b0;--white:#ffffff;
     --shadow:0 4px 24px rgba(15,31,61,0.10);--shadow-lg:0 12px 48px rgba(15,31,61,0.18);
@@ -75,7 +76,6 @@
   .drive-btn.condition-btn:hover{border-color:var(--condition);color:var(--condition);}
   .file-list{margin-top:16px;display:flex;flex-direction:column;gap:8px;}
   .file-item{display:flex;align-items:center;gap:12px;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:10px 14px;animation:fadeIn 0.2s ease;}
-  .file-item.skipped{background:#fdf8f0;border-color:#e8c97a;}
   @keyframes fadeIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
   .file-icon{font-size:20px;flex-shrink:0;}
   .file-info{flex:1;min-width:0;}
@@ -84,14 +84,11 @@
   .file-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;flex-shrink:0;margin-right:4px;}
   .file-badge.from-drive{background:rgba(66,133,244,0.1);color:#4285f4;}
   .file-badge.auto-read{background:rgba(30,132,73,0.1);color:var(--condition);}
-  .file-badge.too-large{background:rgba(192,57,43,0.1);color:var(--danger);}
   .file-status{font-size:11px;font-weight:600;padding:3px 8px;border-radius:10px;flex-shrink:0;}
   .file-status.ready{background:rgba(42,125,79,0.1);color:var(--success);}
-  .file-status.skipped{background:rgba(192,57,43,0.08);color:var(--danger);}
   .file-remove{background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:18px;padding:2px 6px;border-radius:4px;transition:color 0.15s;flex-shrink:0;line-height:1;}
   .file-remove:hover{color:var(--danger);}
   .files-summary{margin-top:12px;font-size:12px;color:var(--text-muted);font-style:italic;}
-  .skip-warning{margin-top:12px;padding:10px 14px;background:#fdf8f0;border:1px solid #e8c97a;border-radius:8px;font-size:12px;color:#7d5a00;line-height:1.5;}
   .or-divider{display:flex;align-items:center;gap:12px;margin:16px 0;}
   .or-divider div{flex:1;height:1px;background:var(--border);}
   .or-divider span{font-size:11px;color:var(--text-muted);font-weight:600;letter-spacing:1px;}
@@ -137,8 +134,6 @@
   .step-hidden{display:none;}
   @media(max-width:600px){.mode-grid{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}.header-title{font-size:26px;}.report-body-wrap{padding:20px;}}
 </style>
-<script src="https://apis.google.com/js/api.js" async defer onload="onGapiLoad()"></script>
-<script src="https://accounts.google.com/gsi/client" async defer onload="onGsiLoad()"></script>
 </head>
 <body>
 <header>
@@ -150,10 +145,14 @@
   </div>
 </header>
 <main>
+
+  <!-- STEP 1: AGENT -->
   <div class="card">
     <div class="card-title"><span class="step-num">1</span> Select Agent</div>
     <div class="agent-grid" id="agentGrid"></div>
   </div>
+
+  <!-- STEP 2: MODE -->
   <div class="card">
     <div class="card-title"><span class="step-num">2</span> Select Report Type</div>
     <div class="mode-grid">
@@ -173,19 +172,23 @@
       </div>
     </div>
   </div>
+
+  <!-- STEP 3: PROPERTY -->
   <div class="card step-hidden" id="step3">
     <div class="card-title"><span class="step-num">3</span> Property & Seller</div>
     <div class="form-row">
       <div class="form-group">
         <label>Property Address</label>
-        <input type="text" id="propAddress" placeholder="e.g. 3306 40th St, Sacramento CA 95817" />
+        <input type="text" id="propAddress" placeholder="e.g. 777 Lucky Ln, Roseville CA 95747" />
       </div>
       <div class="form-group">
         <label>Seller Name</label>
-        <input type="text" id="sellerName" placeholder="e.g. Wesley Simmons" />
+        <input type="text" id="sellerName" placeholder="e.g. Gracey Wixon" />
       </div>
     </div>
   </div>
+
+  <!-- STEP 4: DOCUMENTS -->
   <div class="card step-hidden" id="step4">
     <div class="card-title"><span class="step-num">4</span> <span id="step4Title">Upload Documents</span></div>
     <div class="drive-section" id="driveFolderSection">
@@ -211,17 +214,20 @@
       <div class="drop-zone-text">Drop files here or click to browse from your computer</div>
     </div>
     <div class="file-list" id="fileList"></div>
-    <div id="skipWarning" class="skip-warning" style="display:none;"></div>
     <div class="files-summary" id="filesSummary"></div>
   </div>
+
+  <!-- STEP 5: GENERATE -->
   <div class="card step-hidden" id="step5">
     <div class="card-title"><span class="step-num">5</span> Generate Report</div>
     <button class="generate-btn" id="generateBtn" onclick="generateReport()">✦ Generate Smart Seller Protection Report™</button>
     <div class="status-bar" id="statusBar">
       <div class="spinner"></div>
-      <span id="statusText">Reading documents…</span>
+      <span id="statusText">Uploading documents…</span>
     </div>
   </div>
+
+  <!-- OUTPUT -->
   <div id="report-output">
     <div class="report-header-bar" id="reportHeaderBar">
       <h3>Smart Seller Protection <span>Report™</span></h3>
@@ -235,26 +241,32 @@
     <div class="pabbly-status" id="pabblyStatus"></div>
     <button class="new-report-btn" onclick="resetForm()">← Start New Report</button>
   </div>
+
 </main>
 <script>
 // ── CONFIG ──
-const GOOGLE_API_KEY   = "AIzaSyAZzMGptybfWqP_FS8df2t4qhVdO_VkoT0";
-const GOOGLE_CLIENT_ID = "96917389365-hclaoi15jmlq4uocga79p3dn2s17j6td.apps.googleusercontent.com";
-const DRIVE_SCOPE      = "https://www.googleapis.com/auth/drive.readonly";
-const PABBLY_DISCLOSURE = "/.netlify/functions/send-to-pabbly-disclosure";
-const PABBLY_CONDITION  = "/.netlify/functions/send-to-pabbly-condition";
+let OPENAI_API_KEY = '';
+const OPENAI_MODEL = 'gpt-4o';
+const PABBLY_DISCLOSURE = '/.netlify/functions/send-to-pabbly-disclosure';
+const PABBLY_CONDITION  = '/.netlify/functions/send-to-pabbly-condition';
+const GOOGLE_API_KEY    = 'AIzaSyAZzMGptybfWqP_FS8df2t4qhVdO_VkoT0';
+const GOOGLE_CLIENT_ID  = '96917389365-hclaoi15jmlq4uocga79p3dn2s17j6td.apps.googleusercontent.com';
+const DRIVE_SCOPE       = 'https://www.googleapis.com/auth/drive.readonly';
 
-// ── FILE SIZE LIMITS ──
-const MAX_FILE_MB   = 15;           // skip individual files over 15MB
-const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
-const MAX_GROUP_MB  = 4;            // max base64 payload per Claude call
-const MAX_GROUP_BYTES = MAX_GROUP_MB * 1024 * 1024;
+// Fetch OpenAI key from Netlify function
+(async () => {
+  try {
+    const res  = await fetch('/.netlify/functions/config');
+    const data = await res.json();
+    OPENAI_API_KEY = data.openaiKey || '';
+  } catch(e) { console.error('Could not load config:', e); }
+})();
 
 const AGENTS = [
-  { name:"Samuel K. Zieour", dre:"01397303", initials:"SZ" },
-  { name:"John P. Klein",    dre:"00994179", initials:"JK" },
+  { name:'Samuel K. Zieour', dre:'01397303', initials:'SZ' },
+  { name:'John P. Klein',    dre:'00994179', initials:'JK' },
 ];
-let selectedAgent=null, selectedMode=null, uploadedFiles=[], selectedFolder=null, generatedReport="";
+let selectedAgent=null, selectedMode=null, uploadedFiles=[], selectedFolder=null, generatedReport='', _assistantId=null;
 let pickerApiLoaded=false, gapiInited=false, tokenClient=null, driveAccessToken=null, gapiReady=false, gsiReady=false;
 
 // ── GOOGLE INIT ──
@@ -332,61 +344,30 @@ async function handleFiles(fileList){
   const skipped=[];
   for(const file of Array.from(fileList)){
     if(file.size===0){skipped.push(file.name+' (empty)');continue;}
-    if(file.size>MAX_FILE_BYTES){
-      // Add as skipped-too-large so it shows in UI
-      uploadedFiles.push({file,name:file.name,fromDrive:false,tooLarge:true});
-      continue;
-    }
     if(uploadedFiles.find(f=>f.name===file.name&&f.file.size===file.size)) continue;
     uploadedFiles.push({file,name:file.name,fromDrive:false});
   }
-  if(skipped.length) alert('Skipped '+skipped.length+' empty file(s):\n'+skipped.join('\n'));
+  if(skipped.length) alert('Skipped:\n'+skipped.join('\n'));
   renderFileList();
 }
-
 function removeFile(i){uploadedFiles.splice(i,1);renderFileList();}
-
 function renderFileList(){
-  const list=document.getElementById('fileList');
-  const warning=document.getElementById('skipWarning');
-  const summary=document.getElementById('filesSummary');
-
-  const tooLarge=uploadedFiles.filter(f=>f.tooLarge);
-  const ready=uploadedFiles.filter(f=>!f.tooLarge);
-
+  const list=document.getElementById('fileList'), summary=document.getElementById('filesSummary');
   list.innerHTML=uploadedFiles.map((f,i)=>`
-    <div class="file-item${f.tooLarge?' skipped':''}">
+    <div class="file-item">
       <div class="file-icon">${getFileIcon(f.name)}</div>
-      <div class="file-info">
-        <div class="file-name">${f.name}</div>
-        <div class="file-size">${formatSize(f.file.size)}</div>
-      </div>
+      <div class="file-info"><div class="file-name">${f.name}</div><div class="file-size">${formatSize(f.file.size)}</div></div>
       ${f.fromDrive?'<span class="file-badge from-drive">Drive</span>':''}
       ${f.autoRead?'<span class="file-badge auto-read">Auto</span>':''}
-      ${f.tooLarge?'<span class="file-badge too-large">Too Large</span>':''}
-      <span class="file-status ${f.tooLarge?'skipped':'ready'}">${f.tooLarge?'⚠ Skipped':'✓ Ready'}</span>
+      <span class="file-status ready">✓ Ready</span>
       <button class="file-remove" onclick="removeFile(${i})">×</button>
-    </div>
-  `).join('');
-
-  if(tooLarge.length>0){
-    warning.style.display='block';
-    warning.innerHTML=`⚠️ <strong>${tooLarge.length} file${tooLarge.length>1?'s':''} over ${MAX_FILE_MB}MB will be skipped</strong> — too large to send to Claude:<br>${tooLarge.map(f=>'• '+f.name+' ('+formatSize(f.file.size)+')').join('<br>')}<br><br>These files are excluded automatically. The NHD Full Report atlas is typically not needed — the NHD Signature Pages cover the disclosure obligation.`;
-  } else {
-    warning.style.display='none';
-  }
-
-  const dc=ready.filter(f=>f.fromDrive||f.autoRead).length;
-  const lc=ready.length-dc;
-  const parts=[];
-  if(dc>0) parts.push(dc+' from Drive');
-  if(lc>0) parts.push(lc+' from computer');
-  summary.textContent=ready.length>0
-    ?ready.length+' document'+(ready.length>1?'s':'')+' ready'+(parts.length?' ('+parts.join(', ')+')':'')+' — Claude will read and analyze all content.'
-    :'';
+    </div>`).join('');
+  const dc=uploadedFiles.filter(f=>f.fromDrive||f.autoRead).length, lc=uploadedFiles.length-dc, parts=[];
+  if(dc>0) parts.push(dc+' from Drive'); if(lc>0) parts.push(lc+' from computer');
+  summary.textContent=uploadedFiles.length>0?uploadedFiles.length+' document'+(uploadedFiles.length>1?'s':'')+' ready'+(parts.length?' ('+parts.join(', ')+')':'')+' — will be uploaded directly to OpenAI for analysis.':'';
 }
 
-// ── GOOGLE DRIVE PICKER ──
+// ── GOOGLE DRIVE FOLDER PICKER ──
 function openDriveFolderPicker(){
   const s=document.getElementById('folderStatus');
   if(!gapiReady||!gsiReady){s.textContent='⏳ Loading Google Drive… please try again in a moment.';return;}
@@ -408,22 +389,21 @@ async function folderPickerCallback(data){
 async function readSubfolderFiles(parentId,parentName){
   const s=document.getElementById('folderStatus'), sub=selectedMode==='disclosure'?'A2':'A3';
   try{
-    s.textContent=`📁 ${parentName} — finding Active Transaction folder…`;
+    s.textContent=`📁 Finding Active Transaction folder…`;
     const ar=await fetch(`https://www.googleapis.com/drive/v3/files?q='${parentId}' in parents and name contains '3. Active Transaction' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`,{headers:{Authorization:`Bearer ${driveAccessToken}`}});
     const ad=await ar.json();
     if(!ad.files||!ad.files.length){s.textContent=`⚠️ Could not find "3. Active Transaction" inside ${parentName}. Please upload manually.`;return;}
-    const af=ad.files[0];
     s.textContent=`📁 Finding ${sub} subfolder…`;
-    const sr=await fetch(`https://www.googleapis.com/drive/v3/files?q='${af.id}' in parents and name contains '${sub}' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`,{headers:{Authorization:`Bearer ${driveAccessToken}`}});
+    const sr=await fetch(`https://www.googleapis.com/drive/v3/files?q='${ad.files[0].id}' in parents and name contains '${sub}' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`,{headers:{Authorization:`Bearer ${driveAccessToken}`}});
     const sd=await sr.json();
     if(!sd.files||!sd.files.length){s.textContent=`⚠️ Could not find "${sub}" subfolder. Please upload manually.`;return;}
     const sf=sd.files[0];
     s.textContent=`📁 Reading files from ${sf.name}…`;
     const fr=await fetch(`https://www.googleapis.com/drive/v3/files?q='${sf.id}' in parents and trashed=false and (mimeType='application/pdf' or mimeType='application/vnd.openxmlformats-officedocument.wordprocessingml.document')&fields=files(id,name,size,mimeType)&orderBy=name`,{headers:{Authorization:`Bearer ${driveAccessToken}`}});
-    const fd=await fr.json();const driveFiles=fd.files||[];
+    const fd=await fr.json(); const driveFiles=fd.files||[];
     if(!driveFiles.length){s.textContent=`⚠️ No PDFs found in ${sf.name}. Please upload manually.`;return;}
     uploadedFiles=uploadedFiles.filter(f=>!f.autoRead);
-    let downloaded=0;const dlSkipped=[];
+    let downloaded=0; const dlSkipped=[];
     for(const df of driveFiles){
       try{
         s.textContent=`⬇️ Downloading ${df.name} (${downloaded+1} of ${driveFiles.length})…`;
@@ -431,144 +411,192 @@ async function readSubfolderFiles(parentId,parentName){
         if(!dlr.ok){dlSkipped.push(df.name+' (download failed)');continue;}
         const blob=await dlr.blob();
         if(!blob.size){dlSkipped.push(df.name+' (empty)');continue;}
-        const file=new File([blob],df.name,{type:df.mimeType});
-        if(!uploadedFiles.find(f=>f.name===file.name)){
-          // Mark too-large files — they show in UI but get skipped at generate time
-          uploadedFiles.push({file,name:file.name,fromDrive:true,autoRead:true,tooLarge:file.size>MAX_FILE_BYTES});
+        if(!uploadedFiles.find(f=>f.name===df.name)){
+          uploadedFiles.push({file:new File([blob],df.name,{type:df.mimeType}),name:df.name,fromDrive:true,autoRead:true});
         }
         downloaded++;
       } catch(e){dlSkipped.push(df.name+' (error)');}
     }
-    const largeCount=uploadedFiles.filter(f=>f.tooLarge&&f.autoRead).length;
-    const readyCount=uploadedFiles.filter(f=>!f.tooLarge&&f.autoRead).length;
-    s.textContent=`✅ ${downloaded} file${downloaded!==1?'s':''} loaded from ${sf.name}${largeCount>0?' — '+largeCount+' file(s) over '+MAX_FILE_MB+'MB will be skipped':''}${dlSkipped.length?' ('+dlSkipped.length+' could not download)':''}`;
+    s.textContent=`✅ ${downloaded} file${downloaded!==1?'s':''} loaded from ${sf.name}${dlSkipped.length?' ('+dlSkipped.length+' skipped)':''}`;
     renderFileList();
     if(dlSkipped.length) alert('Could not download:\n'+dlSkipped.join('\n'));
-  } catch(e){s.textContent=`⚠️ Error: ${e.message}. Please upload manually.`;console.error(e);}
+  } catch(e){s.textContent=`⚠️ Error: ${e.message}`;console.error(e);}
+}
+
+// ── OPENAI HELPERS ──
+async function uploadFileToOpenAI(file, setStatus){
+  setStatus(`Uploading ${file.name} to OpenAI…`);
+  const form=new FormData();
+  form.append('file',file,file.name);
+  form.append('purpose','assistants');
+  const res=await fetch('https://api.openai.com/v1/files',{
+    method:'POST',
+    headers:{Authorization:`Bearer ${OPENAI_API_KEY}`},
+    body:form
+  });
+  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(`File upload failed for "${file.name}": ${e.error?.message||res.status}`);}
+  return (await res.json()).id;
+}
+
+async function createVectorStore(fileIds, setStatus){
+  setStatus('Indexing documents…');
+  const vsRes=await fetch('https://api.openai.com/v1/vector_stores',{
+    method:'POST',
+    headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'Content-Type':'application/json','OpenAI-Beta':'assistants=v2'},
+    body:JSON.stringify({name:'sspr-docs',file_ids:fileIds})
+  });
+  if(!vsRes.ok){const e=await vsRes.json().catch(()=>({}));throw new Error(`Vector store failed: ${e.error?.message||vsRes.status}`);}
+  const vs=await vsRes.json(); const vsId=vs.id;
+  let attempts=0;
+  while(attempts<40){
+    await new Promise(r=>setTimeout(r,3000)); attempts++;
+    const pr=await fetch(`https://api.openai.com/v1/vector_stores/${vsId}`,{headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'OpenAI-Beta':'assistants=v2'}});
+    const pd=await pr.json(); const c=pd.file_counts;
+    setStatus(`Indexing documents… (${c.completed}/${c.total} processed)`);
+    if(pd.status==='completed'||c.in_progress===0) break;
+  }
+  return vsId;
+}
+
+async function getOrCreateAssistant(vsId, systemPrompt){
+  if(_assistantId) return _assistantId;
+  const res=await fetch('https://api.openai.com/v1/assistants',{
+    method:'POST',
+    headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'Content-Type':'application/json','OpenAI-Beta':'assistants=v2'},
+    body:JSON.stringify({
+      name:'Smart Seller Protection Report Generator',
+      model:OPENAI_MODEL,
+      instructions:systemPrompt,
+      tools:[{type:'file_search'}],
+      tool_resources:{file_search:{vector_store_ids:[vsId]}}
+    })
+  });
+  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(`Assistant creation failed: ${e.error?.message||res.status}`);}
+  _assistantId=(await res.json()).id;
+  return _assistantId;
+}
+
+async function runAssistant(vsId, prompt, systemPrompt, setStatus){
+  setStatus('Analyzing documents and generating report…');
+  const assistantId=await getOrCreateAssistant(vsId, systemPrompt);
+  const threadRes=await fetch('https://api.openai.com/v1/threads',{
+    method:'POST',
+    headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'Content-Type':'application/json','OpenAI-Beta':'assistants=v2'},
+    body:JSON.stringify({messages:[{role:'user',content:prompt}],tool_resources:{file_search:{vector_store_ids:[vsId]}}})
+  });
+  if(!threadRes.ok){const e=await threadRes.json().catch(()=>({}));throw new Error(`Thread failed: ${e.error?.message||threadRes.status}`);}
+  const thread=await threadRes.json();
+  const runRes=await fetch(`https://api.openai.com/v1/threads/${thread.id}/runs`,{
+    method:'POST',
+    headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'Content-Type':'application/json','OpenAI-Beta':'assistants=v2'},
+    body:JSON.stringify({assistant_id:assistantId,stream:false})
+  });
+  if(!runRes.ok){const e=await runRes.json().catch(()=>({}));throw new Error(`Run failed: ${e.error?.message||runRes.status}`);}
+  const run=await runRes.json();
+  let attempts=0;
+  while(attempts<60){
+    await new Promise(r=>setTimeout(r,4000)); attempts++;
+    const pr=await fetch(`https://api.openai.com/v1/threads/${thread.id}/runs/${run.id}`,{headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'OpenAI-Beta':'assistants=v2'}});
+    const pd=await pr.json();
+    if(pd.status==='completed') break;
+    if(['failed','cancelled','expired'].includes(pd.status)) throw new Error(`Run ${pd.status}: ${pd.last_error?.message||'unknown'}`);
+    setStatus(`Generating report… (${pd.status})`);
+  }
+  const msgRes=await fetch(`https://api.openai.com/v1/threads/${thread.id}/messages`,{headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'OpenAI-Beta':'assistants=v2'}});
+  const msgData=await msgRes.json();
+  const msg=msgData.data.find(m=>m.role==='assistant');
+  if(!msg) throw new Error('No response from assistant.');
+  return msg.content.filter(c=>c.type==='text').map(c=>c.text.value).join('').replace(/【\d+:\d+†[^】]*】/g,'');
+}
+
+async function cleanup(fileIds, vsId){
+  try{
+    if(vsId) await fetch(`https://api.openai.com/v1/vector_stores/${vsId}`,{method:'DELETE',headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'OpenAI-Beta':'assistants=v2'}});
+    for(const fid of fileIds) await fetch(`https://api.openai.com/v1/files/${fid}`,{method:'DELETE',headers:{Authorization:`Bearer ${OPENAI_API_KEY}`}});
+    if(_assistantId) await fetch(`https://api.openai.com/v1/assistants/${_assistantId}`,{method:'DELETE',headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'OpenAI-Beta':'assistants=v2'}});
+  } catch(e){console.warn('Cleanup error (non-fatal):',e);}
 }
 
 // ── GENERATE ──
 async function generateReport(){
+  if(!OPENAI_API_KEY){alert('Configuration not loaded yet — please wait a moment and try again.');return;}
   if(!selectedAgent){alert('Please select an agent.');return;}
   if(!selectedMode){alert('Please select a report type.');return;}
   const address=document.getElementById('propAddress').value.trim();
   const seller=document.getElementById('sellerName').value.trim();
   if(!address||!seller){alert('Please enter property address and seller name.');return;}
-  const readyFiles=uploadedFiles.filter(f=>!f.tooLarge);
-  if(!readyFiles.length){alert('No sendable documents — all files may be over the '+MAX_FILE_MB+'MB limit. Please upload smaller files manually.');return;}
+  if(!uploadedFiles.length){alert('Please add documents — either from Drive or upload manually.');return;}
 
-  const btn=document.getElementById('generateBtn'),statusBar=document.getElementById('statusBar'),statusText=document.getElementById('statusText');
-  btn.disabled=true;document.getElementById('report-output').style.display='none';statusBar.className='status-bar loading';
+  const btn=document.getElementById('generateBtn'), statusBar=document.getElementById('statusBar'), statusText=document.getElementById('statusText');
+  btn.disabled=true; document.getElementById('report-output').style.display='none'; statusBar.className='status-bar loading';
   const setStatus=msg=>{statusText.textContent=msg;};
   const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const uploadedFileIds=[]; let vsId=null;
 
   try{
-    // Convert ready files to base64
-    const fileContents=[];
-    for(let i=0;i<readyFiles.length;i++){
-      const f=readyFiles[i];
-      setStatus(`Preparing ${f.name} (${i+1} of ${readyFiles.length})…`);
-      const base64=await fileToBase64(f.file);
-      fileContents.push({name:f.name,base64,mediaType:f.file.type||'application/pdf',size:f.file.size});
+    // Upload all files directly to OpenAI — no size limit issues
+    for(let i=0;i<uploadedFiles.length;i++){
+      const f=uploadedFiles[i];
+      setStatus(`Uploading file ${i+1} of ${uploadedFiles.length}: ${f.name}…`);
+      await new Promise(r=>setTimeout(r,30));
+      const fileId=await uploadFileToOpenAI(f.file,setStatus);
+      uploadedFileIds.push(fileId);
     }
 
-    // Smart grouping — keep each group under MAX_GROUP_BYTES (base64 is ~1.33x raw)
-    setStatus('Grouping documents for analysis…');
-    const groups=[];
-    let currentGroup=[], currentSize=0;
-    for(const fc of fileContents){
-      const est=fc.base64.length; // base64 string length ≈ payload size
-      if(currentGroup.length>0 && currentSize+est > MAX_GROUP_BYTES*1.33){
-        groups.push(currentGroup);
-        currentGroup=[fc];currentSize=est;
-      } else {
-        currentGroup.push(fc);currentSize+=est;
-      }
-    }
-    if(currentGroup.length) groups.push(currentGroup);
+    vsId=await createVectorStore(uploadedFileIds,setStatus);
+    _assistantId=null;
 
-    const prompt=selectedMode==='disclosure'?buildDisclosurePrompt(address,seller,today):buildConditionPrompt(address,seller,today);
-    let fullReport='';
+    const systemPrompt=selectedMode==='disclosure'?getDisclosureSystemPrompt():getConditionSystemPrompt();
+    const userPrompt=selectedMode==='disclosure'?buildDisclosurePrompt(address,seller,today):buildConditionPrompt(address,seller,today);
 
-    if(groups.length===1){
-      setStatus('Sending to Claude for analysis…');
-      fullReport=await callClaude(groups[0],prompt,setStatus);
-    } else {
-      const findings=[];
-      for(let g=0;g<groups.length;g++){
-        if(g>0){
-          setStatus(`Pausing between groups… (${g} of ${groups.length} complete)`);
-          await new Promise(r=>setTimeout(r,3000));
-        }
-        setStatus(`Analyzing document group ${g+1} of ${groups.length}…`);
-        const names=groups[g].map(f=>f.name).join(', ');
-        findings.push(await callClaude(groups[g],`This is document group ${g+1} of ${groups.length} (${names}). Extract all key findings — document type, execution status, party names, key dates, risk items. Do not write the final report yet.`,setStatus));
-      }
-      setStatus('Synthesizing full report from all documents…');
-      fullReport=await callClaude([],`You have reviewed ${readyFiles.length} transaction documents in ${groups.length} groups. Here are the extracted findings:\n\n${findings.join('\n\n--- NEXT GROUP ---\n\n')}\n\n${prompt}`,setStatus);
-    }
+    generatedReport=await runAssistant(vsId,userPrompt,systemPrompt,setStatus);
 
-    generatedReport=fullReport;
     document.getElementById('reportBody').textContent=generatedReport;
     document.getElementById('reportHeaderBar').className=selectedMode==='disclosure'?'report-header-bar disclosure-header':'report-header-bar condition-header';
     document.getElementById('report-output').style.display='block';
     statusBar.className='status-bar';
     document.getElementById('report-output').scrollIntoView({behavior:'smooth',block:'start'});
 
+    cleanup(uploadedFileIds,vsId);
+
   } catch(err){
     statusBar.className='status-bar error';
     statusText.textContent='Error: '+err.message;
     console.error(err);
+    if(uploadedFileIds.length) cleanup(uploadedFileIds,vsId);
   } finally {
     btn.disabled=false;
   }
 }
 
-async function fileToBase64(file){
-  return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=()=>rej(new Error('Failed to read file'));r.readAsDataURL(file);});
+// ── SYSTEM PROMPTS ──
+function getDisclosureSystemPrompt(){
+  return `You are a highly experienced California real estate advisor with 22 years as a listing agent and 18 years in construction. You protect sellers by identifying disclosure risks, gaps, and listing strategy — not to alarm them, but to prepare them with clear, actionable intelligence.
+
+Read every document in full. For each document note: type, execution status, party signatures, key dates, and any risk items.
+
+Plain text only. No markdown. No asterisks. No pound signs. No citation brackets. Use ALL CAPS for section headers.`;
 }
 
-async function callClaude(files,userPrompt,setStatus){
-  const content=[];
-  for(const f of files){
-    if(f.mediaType==='application/pdf'){
-      content.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:f.base64}});
-    } else {
-      content.push({type:'text',text:`[Document: ${f.name} — non-PDF, analyze by filename]`});
-    }
-  }
-  content.push({type:'text',text:userPrompt});
+function getConditionSystemPrompt(){
+  return `You are a highly experienced California real estate advisor with 22 years as a listing agent and 18 years in construction. You protect sellers during the inspection and repair negotiation phase — helping them understand what to accept, counter, or decline with clear rationale and negotiation strategy.
 
-  const res=await fetch('/.netlify/functions/claude',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',
-      max_tokens:4000,
-      system:`You are a highly experienced California real estate advisor with 22 years as a listing agent and 18 years in construction. You have deep knowledge of California disclosure requirements (TDS, SPQ, NHD, AVID, FIRPTA), construction defects, deferred maintenance, listing strategy, negotiation, and risk assessment for sellers. Your role is to protect the seller by identifying risks, gaps, and negotiation strategy — not to scare them, but to prepare them with clear, actionable intelligence. Plain text only. No markdown. No asterisks. No pound signs. Use ALL CAPS for section headers.`,
-      messages:[{role:'user',content}]
-    })
-  });
+Read every document in full including every line of every inspection report and every item in repair requests.
 
-  if(!res.ok){
-    const errData=await res.json().catch(()=>({}));
-    const msg=errData.error?.message||errData.error?.type||`API error ${res.status}`;
-    throw new Error(msg);
-  }
-  const data=await res.json();
-  if(data.error) throw new Error(data.error.message||'Claude API error');
-  return data.content.filter(c=>c.type==='text').map(c=>c.text).join('');
+Plain text only. No markdown. No asterisks. No pound signs. No citation brackets. Use ALL CAPS for section headers.`;
 }
 
-// ── PROMPTS ──
+// ── USER PROMPTS ──
 function buildDisclosurePrompt(address,seller,today){
-  return `Generate a complete SMART SELLER PROTECTION REPORT™ — Disclosure Review.
+  return `Generate a complete SMART SELLER PROTECTION REPORT™ — Disclosure Review using ALL uploaded documents.
 
 Property Address: ${address}
 Seller Name: ${seller}
 Date: ${today}
 Prepared By: ${selectedAgent.name} | SZ Real Estate Group
 Agent License #: ${selectedAgent.dre}
+
+Read every document in full. Output the complete report in this exact format:
 
 SMART SELLER PROTECTION REPORT™
 Listing Disclosure Review
@@ -593,18 +621,18 @@ Listing Readiness: [Ready / Needs Work / Address Before Listing]
 
 DOCUMENTS REVIEWED
 
-[List every document analyzed with type and status]
+[List every document analyzed with type and execution status]
 
 ----------------------------------------
 
 DISCLOSURE COMPLETENESS CHECK
 
-TDS (Transfer Disclosure Statement): [status]
-SPQ (Seller Property Questionnaire): [status]
-NHD (Natural Hazard Disclosure): [status]
-AVID-LA (Agent Visual Inspection): [status]
-Preliminary Title Report: [status]
-FIRPTA Affidavit: [status]
+TDS (Transfer Disclosure Statement): [Present / Missing / Incomplete]
+SPQ (Seller Property Questionnaire): [Present / Missing / Incomplete]
+NHD (Natural Hazard Disclosure): [Present / Missing / Incomplete]
+AVID-LA (Agent Visual Inspection): [Present / Missing / Incomplete]
+Preliminary Title Report: [Present / Missing / Incomplete]
+FIRPTA Affidavit: [Present / Missing / Incomplete]
 Other documents present: [list]
 Missing recommended disclosures: [list]
 
@@ -612,19 +640,28 @@ Missing recommended disclosures: [list]
 
 RISK FLAGS — ITEMS A BUYER'S AGENT WILL CHALLENGE
 
-[For each flag: FLAG TITLE IN ALL CAPS, Source, Risk Level, Category, description, Seller Recommendation]
+[For each flag:]
+[FLAG TITLE IN ALL CAPS]
+Source: [document name]
+Risk Level: [Low / Moderate / High]
+Category: [Legal / Physical / Environmental / Title / Disclosure Gap]
+
+[Description — what a buyer's agent will say, how common it is]
+
+Seller Recommendation:
+[What to do — clarify, repair, disclose proactively, or price accordingly]
 
 ----------------------------------------
 
 TITLE & OWNERSHIP REVIEW
 
-[Vesting, liens, easements, CC&Rs, encumbrances that could delay or kill the deal]
+[From Preliminary Title Report: vesting, liens, easements, CC&Rs, encumbrances that could delay or kill the deal]
 
 ----------------------------------------
 
 NATURAL HAZARD EXPOSURE
 
-[Flood zone, fire zone, seismic, liquefaction — insurance implications, disclosure obligations, buyer concern level]
+[From NHD: flood zone, fire zone, seismic, liquefaction. For each: insurance implications, disclosure obligations, buyer concern level]
 
 ----------------------------------------
 
@@ -636,9 +673,14 @@ MISSING OR VAGUE DISCLOSURES
 
 PRE-LISTING RECOMMENDATIONS
 
-Priority 1 — Must Address: [list]
-Priority 2 — Recommended: [list]
-Priority 3 — Optional: [list]
+Priority 1 — Must Address Before Listing:
+[list]
+
+Priority 2 — Recommended:
+[list]
+
+Priority 3 — Optional:
+[list]
 
 ----------------------------------------
 
@@ -655,7 +697,7 @@ Physical Condition: [Good / Fair / Needs Work]
 Title Status: [Clean / Issues to Resolve]
 Listing Risk: [Low / Moderate / Elevated]
 
-[3-4 sentence summary and recommended next steps.]
+[3-4 sentences summarizing overall readiness and next steps.]
 
 ----------------------------------------
 
@@ -670,13 +712,15 @@ This report was prepared for seller advisory purposes only and does not constitu
 }
 
 function buildConditionPrompt(address,seller,today){
-  return `Generate a complete SMART SELLER PROTECTION REPORT™ — Condition Analysis.
+  return `Generate a complete SMART SELLER PROTECTION REPORT™ — Condition Analysis using ALL uploaded documents.
 
 Property Address: ${address}
 Seller Name: ${seller}
 Date: ${today}
 Prepared By: ${selectedAgent.name} | SZ Real Estate Group
 Agent License #: ${selectedAgent.dre}
+
+Read every document in full — every line of every inspection report, every RFR item. Output the complete report in this exact format:
 
 SMART SELLER PROTECTION REPORT™
 In-Contract Condition Analysis
@@ -732,24 +776,34 @@ OTHER FINDINGS
 
 RFR ANALYSIS — ITEM BY ITEM
 
-[For each item: ITEM NAME IN ALL CAPS, Buyer Requested, Classification, Seller Recommendation, Rationale]
+[For each item:]
+[ITEM NAME IN ALL CAPS]
+Buyer Requested: [exact request]
+Classification: [Legitimate / Aggressive / Unreasonable]
+Seller Recommendation: [Accept / Counter / Decline]
+Rationale: [why — inspection finding, market norms, liability]
 
 ----------------------------------------
 
 NEGOTIATION STRATEGY
 
-Items to ACCEPT: [list with rationale]
-Items to COUNTER: [list with counter-position]
-Items to DECLINE: [list with rationale]
+Items to ACCEPT:
+[list with rationale]
+
+Items to COUNTER:
+[list with suggested counter-position]
+
+Items to DECLINE:
+[list with rationale]
 
 Overall Recommended Response: [Credit / Repairs / Combination / As-Is]
-Suggested Credit Amount: [range only if applicable]
+Suggested Credit Amount: [range only, if applicable]
 
 ----------------------------------------
 
 COE RISK ASSESSMENT
 
-[Items that could jeopardize closing, financing concerns, permit issues, pest clearance, timeline risks]
+[Items that could jeopardize closing — financing, permits, pest clearance, timeline risks]
 
 ----------------------------------------
 
@@ -763,7 +817,7 @@ OVERALL POSITION
 
 Inspection Results: [Better / As Expected / Worse than expected for age and price]
 RFR Reasonableness: [Reasonable / Slightly aggressive / Very aggressive]
-Recommended Action: [Accept as submitted / Counter with X / Decline and defend]
+Recommended Action: [Accept as submitted / Counter / Decline and defend]
 
 [3-4 sentence summary on negotiation position and path to closing.]
 
@@ -779,7 +833,7 @@ Agent License #: ${selectedAgent.dre}
 This report was prepared for seller advisory purposes only and does not constitute legal advice. Agent verification required before COE.`;
 }
 
-// ── COPY / PRINT / SEND ──
+// ── COPY / PRINT / SEND / RESET ──
 function copyReport(){
   navigator.clipboard.writeText(generatedReport).then(()=>{
     const b=event.target;b.textContent='Copied!';setTimeout(()=>b.textContent='Copy Report',2000);
@@ -807,26 +861,20 @@ async function sendToPabbly(){
     })});
     ps.className='pabbly-status sent';ps.innerHTML='✓ Sent to Pabbly — Google Doc will appear in your Drive folder shortly.';
     document.getElementById('pabblyBtn').textContent='✓ Sent to Drive';document.getElementById('pabblyBtn').disabled=true;
-  } catch(e){ps.className='pabbly-status failed';ps.innerHTML='✗ Failed to reach Pabbly. Check webhook URL.';}
+  } catch(e){ps.className='pabbly-status failed';ps.innerHTML='✗ Failed to reach Pabbly.';}
 }
-
-// ── RESET ──
 function resetForm(){
   document.querySelectorAll('.agent-card').forEach(c=>c.classList.remove('selected'));
   ['modeDisclosure','modeCondition'].forEach(id=>document.getElementById(id).classList.remove('selected-disclosure','selected-condition'));
-  selectedAgent=null;selectedMode=null;selectedFolder=null;uploadedFiles=[];generatedReport='';
+  selectedAgent=null;selectedMode=null;selectedFolder=null;uploadedFiles=[];generatedReport='';_assistantId=null;
   ['propAddress','sellerName'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('fileList').innerHTML='';
-  document.getElementById('filesSummary').textContent='';
-  document.getElementById('fileInput').value='';
-  document.getElementById('folderStatus').textContent='';
-  document.getElementById('skipWarning').style.display='none';
+  document.getElementById('fileList').innerHTML='';document.getElementById('filesSummary').textContent='';
+  document.getElementById('fileInput').value='';document.getElementById('folderStatus').textContent='';
   ['step3','step4','step5'].forEach(id=>document.getElementById(id).classList.add('step-hidden'));
   document.getElementById('report-output').style.display='none';
   document.getElementById('statusBar').className='status-bar';
   document.getElementById('pabblyStatus').className='pabbly-status';
-  document.getElementById('pabblyBtn').textContent='Save to Google Drive';
-  document.getElementById('pabblyBtn').disabled=false;
+  document.getElementById('pabblyBtn').textContent='Save to Google Drive';document.getElementById('pabblyBtn').disabled=false;
   window.scrollTo({top:0,behavior:'smooth'});
 }
 </script>
