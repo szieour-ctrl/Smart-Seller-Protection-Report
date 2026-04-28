@@ -491,19 +491,42 @@ function initGoogleAPIs() {
 }
 
 function openDriveFolderPicker() {
-  // Init APIs if not ready yet — scripts may still be loading
+  const statusEl = document.getElementById('folderStatus');
+
+  // Step 1: Google scripts not loaded yet
   if (typeof gapi === 'undefined' || typeof google === 'undefined') {
-    document.getElementById('folderStatus').textContent = 'Loading Google API… please try again in a moment.';
+    statusEl.textContent = '⏳ Loading Google Drive… clicking again in 2 seconds.';
     setTimeout(openDriveFolderPicker, 2000); return;
   }
-  if (!pickerApiLoaded || !gapiInited || !tokenClient) {
-    initGoogleAPIs();
-    document.getElementById('folderStatus').textContent = 'Initializing Drive connection…';
-    setTimeout(openDriveFolderPicker, 2000); return;
+
+  // Step 2: gapi loaded but picker/client not initialized yet — init now
+  if (!tokenClient) {
+    statusEl.textContent = '⏳ Connecting to Google Drive…';
+    // Initialize inline without waiting for load event
+    gapi.load('picker', () => { pickerApiLoaded = true; });
+    gapi.load('client', async () => {
+      await gapi.client.init({});
+      gapiInited = true;
+    });
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: DRIVE_SCOPE,
+      callback: (resp) => {
+        if (resp.error) { statusEl.textContent = '⚠️ Google sign-in failed. Please try again.'; return; }
+        driveAccessToken = resp.access_token;
+        statusEl.textContent = '';
+        showFolderPicker();
+      }
+    });
+    setTimeout(openDriveFolderPicker, 1500); return;
   }
-  document.getElementById('folderStatus').textContent = '';
+
+  // Step 3: Ready — request token or show picker
+  statusEl.textContent = '';
   pendingAction = 'folder';
-  if (!driveAccessToken) { tokenClient.requestAccessToken({ prompt: 'select_account' }); return; }
+  if (!driveAccessToken) {
+    tokenClient.requestAccessToken({ prompt: 'select_account' }); return;
+  }
   showFolderPicker();
 }
 
