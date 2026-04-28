@@ -145,14 +145,10 @@
   </div>
 </header>
 <main>
-
-  <!-- STEP 1: AGENT -->
   <div class="card">
     <div class="card-title"><span class="step-num">1</span> Select Agent</div>
     <div class="agent-grid" id="agentGrid"></div>
   </div>
-
-  <!-- STEP 2: MODE -->
   <div class="card">
     <div class="card-title"><span class="step-num">2</span> Select Report Type</div>
     <div class="mode-grid">
@@ -172,8 +168,6 @@
       </div>
     </div>
   </div>
-
-  <!-- STEP 3: PROPERTY -->
   <div class="card step-hidden" id="step3">
     <div class="card-title"><span class="step-num">3</span> Property & Seller</div>
     <div class="form-row">
@@ -187,8 +181,6 @@
       </div>
     </div>
   </div>
-
-  <!-- STEP 4: DOCUMENTS -->
   <div class="card step-hidden" id="step4">
     <div class="card-title"><span class="step-num">4</span> <span id="step4Title">Upload Documents</span></div>
     <div class="drive-section" id="driveFolderSection">
@@ -216,8 +208,6 @@
     <div class="file-list" id="fileList"></div>
     <div class="files-summary" id="filesSummary"></div>
   </div>
-
-  <!-- STEP 5: GENERATE -->
   <div class="card step-hidden" id="step5">
     <div class="card-title"><span class="step-num">5</span> Generate Report</div>
     <button class="generate-btn" id="generateBtn" onclick="generateReport()">✦ Generate Smart Seller Protection Report™</button>
@@ -226,8 +216,6 @@
       <span id="statusText">Uploading documents…</span>
     </div>
   </div>
-
-  <!-- OUTPUT -->
   <div id="report-output">
     <div class="report-header-bar" id="reportHeaderBar">
       <h3>Smart Seller Protection <span>Report™</span></h3>
@@ -241,19 +229,17 @@
     <div class="pabbly-status" id="pabblyStatus"></div>
     <button class="new-report-btn" onclick="resetForm()">← Start New Report</button>
   </div>
-
 </main>
 <script>
 // ── CONFIG ──
 let OPENAI_API_KEY = '';
-const OPENAI_MODEL = 'gpt-4o';
+const OPENAI_MODEL  = 'gpt-4o';
+const GOOGLE_API_KEY   = 'AIzaSyAZzMGptybfWqP_FS8df2t4qhVdO_VkoT0';
+const GOOGLE_CLIENT_ID = '96917389365-hclaoi15jmlq4uocga79p3dn2s17j6td.apps.googleusercontent.com';
+const DRIVE_SCOPE      = 'https://www.googleapis.com/auth/drive.readonly';
 const PABBLY_DISCLOSURE = '/.netlify/functions/send-to-pabbly-disclosure';
 const PABBLY_CONDITION  = '/.netlify/functions/send-to-pabbly-condition';
-const GOOGLE_API_KEY    = 'AIzaSyAZzMGptybfWqP_FS8df2t4qhVdO_VkoT0';
-const GOOGLE_CLIENT_ID  = '96917389365-hclaoi15jmlq4uocga79p3dn2s17j6td.apps.googleusercontent.com';
-const DRIVE_SCOPE       = 'https://www.googleapis.com/auth/drive.readonly';
 
-// Fetch OpenAI key from Netlify function
 (async () => {
   try {
     const res  = await fetch('/.netlify/functions/config');
@@ -439,7 +425,7 @@ async function uploadFileToOpenAI(file, setStatus){
 }
 
 async function createVectorStore(fileIds, setStatus){
-  setStatus('Indexing documents…');
+  setStatus('Indexing all documents…');
   const vsRes=await fetch('https://api.openai.com/v1/vector_stores',{
     method:'POST',
     headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'Content-Type':'application/json','OpenAI-Beta':'assistants=v2'},
@@ -452,7 +438,7 @@ async function createVectorStore(fileIds, setStatus){
     await new Promise(r=>setTimeout(r,3000)); attempts++;
     const pr=await fetch(`https://api.openai.com/v1/vector_stores/${vsId}`,{headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'OpenAI-Beta':'assistants=v2'}});
     const pd=await pr.json(); const c=pd.file_counts;
-    setStatus(`Indexing documents… (${c.completed}/${c.total} processed)`);
+    setStatus(`Indexing documents… (${c.completed}/${c.total} indexed)`);
     if(pd.status==='completed'||c.in_progress===0) break;
   }
   return vsId;
@@ -477,8 +463,8 @@ async function getOrCreateAssistant(vsId, systemPrompt){
 }
 
 async function runAssistant(vsId, prompt, systemPrompt, setStatus){
-  setStatus('Analyzing documents and generating report…');
-  const assistantId=await getOrCreateAssistant(vsId, systemPrompt);
+  setStatus('Analyzing all documents…');
+  const assistantId=await getOrCreateAssistant(vsId,systemPrompt);
   const threadRes=await fetch('https://api.openai.com/v1/threads',{
     method:'POST',
     headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'Content-Type':'application/json','OpenAI-Beta':'assistants=v2'},
@@ -509,11 +495,14 @@ async function runAssistant(vsId, prompt, systemPrompt, setStatus){
   return msg.content.filter(c=>c.type==='text').map(c=>c.text.value).join('').replace(/【\d+:\d+†[^】]*】/g,'');
 }
 
-async function cleanup(fileIds, vsId){
+async function cleanup(fileIds,vsId){
   try{
     if(vsId) await fetch(`https://api.openai.com/v1/vector_stores/${vsId}`,{method:'DELETE',headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'OpenAI-Beta':'assistants=v2'}});
     for(const fid of fileIds) await fetch(`https://api.openai.com/v1/files/${fid}`,{method:'DELETE',headers:{Authorization:`Bearer ${OPENAI_API_KEY}`}});
-    if(_assistantId) await fetch(`https://api.openai.com/v1/assistants/${_assistantId}`,{method:'DELETE',headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'OpenAI-Beta':'assistants=v2'}});
+    if(_assistantId){
+      await fetch(`https://api.openai.com/v1/assistants/${_assistantId}`,{method:'DELETE',headers:{Authorization:`Bearer ${OPENAI_API_KEY}`,'OpenAI-Beta':'assistants=v2'}});
+      _assistantId=null;
+    }
   } catch(e){console.warn('Cleanup error (non-fatal):',e);}
 }
 
@@ -533,21 +522,24 @@ async function generateReport(){
   const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
   const uploadedFileIds=[]; let vsId=null;
 
+  // Build explicit file manifest to pass into the prompt
+  const fileManifest = uploadedFiles.map((f,i) => `${i+1}. ${f.name} (${formatSize(f.file.size)})`).join('\n');
+
   try{
-    // Upload all files directly to OpenAI — no size limit issues
     for(let i=0;i<uploadedFiles.length;i++){
       const f=uploadedFiles[i];
       setStatus(`Uploading file ${i+1} of ${uploadedFiles.length}: ${f.name}…`);
       await new Promise(r=>setTimeout(r,30));
-      const fileId=await uploadFileToOpenAI(f.file,setStatus);
-      uploadedFileIds.push(fileId);
+      uploadedFileIds.push(await uploadFileToOpenAI(f.file,setStatus));
     }
 
     vsId=await createVectorStore(uploadedFileIds,setStatus);
     _assistantId=null;
 
-    const systemPrompt=selectedMode==='disclosure'?getDisclosureSystemPrompt():getConditionSystemPrompt();
-    const userPrompt=selectedMode==='disclosure'?buildDisclosurePrompt(address,seller,today):buildConditionPrompt(address,seller,today);
+    const systemPrompt = selectedMode==='disclosure' ? getDisclosureSystemPrompt() : getConditionSystemPrompt();
+    const userPrompt   = selectedMode==='disclosure'
+      ? buildDisclosurePrompt(address, seller, today, fileManifest)
+      : buildConditionPrompt(address, seller, today, fileManifest);
 
     generatedReport=await runAssistant(vsId,userPrompt,systemPrompt,setStatus);
 
@@ -556,7 +548,6 @@ async function generateReport(){
     document.getElementById('report-output').style.display='block';
     statusBar.className='status-bar';
     document.getElementById('report-output').scrollIntoView({behavior:'smooth',block:'start'});
-
     cleanup(uploadedFileIds,vsId);
 
   } catch(err){
@@ -571,24 +562,30 @@ async function generateReport(){
 
 // ── SYSTEM PROMPTS ──
 function getDisclosureSystemPrompt(){
-  return `You are a highly experienced California real estate advisor with 22 years as a listing agent and 18 years in construction. You protect sellers by identifying disclosure risks, gaps, and listing strategy — not to alarm them, but to prepare them with clear, actionable intelligence.
+  return `You are a highly experienced California real estate advisor with 22 years as a listing agent and 18 years in construction. You protect sellers by identifying disclosure risks, gaps, and listing strategy.
 
-Read every document in full. For each document note: type, execution status, party signatures, key dates, and any risk items.
+CRITICAL INSTRUCTION: You will be given a manifest of ALL uploaded files. You MUST search for and read EVERY file listed in that manifest before writing anything. Do not skip any file. Do not assume a file is missing — search for it by filename. Every file has been successfully uploaded and indexed.
 
-Plain text only. No markdown. No asterisks. No pound signs. No citation brackets. Use ALL CAPS for section headers.`;
+Plain text only. No markdown. No asterisks. No pound signs. No citation brackets like [1] or [2]. Use ALL CAPS for section headers.`;
 }
 
 function getConditionSystemPrompt(){
-  return `You are a highly experienced California real estate advisor with 22 years as a listing agent and 18 years in construction. You protect sellers during the inspection and repair negotiation phase — helping them understand what to accept, counter, or decline with clear rationale and negotiation strategy.
+  return `You are a highly experienced California real estate advisor with 22 years as a listing agent and 18 years in construction. You protect sellers during inspection and repair negotiation.
 
-Read every document in full including every line of every inspection report and every item in repair requests.
+CRITICAL INSTRUCTION: You will be given a manifest of ALL uploaded files. You MUST search for and read EVERY file listed in that manifest before writing anything. Do not skip any file. Do not assume a file is missing — search for it by filename. Every file has been successfully uploaded and indexed.
 
-Plain text only. No markdown. No asterisks. No pound signs. No citation brackets. Use ALL CAPS for section headers.`;
+Plain text only. No markdown. No asterisks. No pound signs. No citation brackets like [1] or [2]. Use ALL CAPS for section headers.`;
 }
 
 // ── USER PROMPTS ──
-function buildDisclosurePrompt(address,seller,today){
-  return `Generate a complete SMART SELLER PROTECTION REPORT™ — Disclosure Review using ALL uploaded documents.
+function buildDisclosurePrompt(address, seller, today, fileManifest){
+  return `You have been provided with the following ${uploadedFiles.length} disclosure documents for this transaction. ALL of these files are in your vector store — search for each one by name and read it completely before writing the report:
+
+${fileManifest}
+
+STEP 1 — Before writing the report, search for and confirm you have read each file above. Note what document type each file contains.
+
+STEP 2 — Generate the complete SMART SELLER PROTECTION REPORT™ using findings from ALL files above.
 
 Property Address: ${address}
 Seller Name: ${seller}
@@ -596,7 +593,7 @@ Date: ${today}
 Prepared By: ${selectedAgent.name} | SZ Real Estate Group
 Agent License #: ${selectedAgent.dre}
 
-Read every document in full. Output the complete report in this exact format:
+Output the complete report in this exact format:
 
 SMART SELLER PROTECTION REPORT™
 Listing Disclosure Review
@@ -611,7 +608,7 @@ Agent License #: ${selectedAgent.dre}
 
 EXECUTIVE SUMMARY
 
-[Overview of disclosure package completeness, overall risk level, key concerns, and listing readiness. Note every document reviewed.]
+[Overview of disclosure package completeness, overall risk level, key concerns, and listing readiness. Reference specific findings from the actual documents.]
 
 Disclosure Package Status: [Complete / Incomplete / Needs Attention]
 Overall Risk Level: [Low / Moderate / Elevated]
@@ -621,60 +618,60 @@ Listing Readiness: [Ready / Needs Work / Address Before Listing]
 
 DOCUMENTS REVIEWED
 
-[List every document analyzed with type and execution status]
+[List every file from the manifest above and what document type it contains and whether it is executed/signed]
 
 ----------------------------------------
 
 DISCLOSURE COMPLETENESS CHECK
 
-TDS (Transfer Disclosure Statement): [Present / Missing / Incomplete]
-SPQ (Seller Property Questionnaire): [Present / Missing / Incomplete]
-NHD (Natural Hazard Disclosure): [Present / Missing / Incomplete]
-AVID-LA (Agent Visual Inspection): [Present / Missing / Incomplete]
-Preliminary Title Report: [Present / Missing / Incomplete]
-FIRPTA Affidavit: [Present / Missing / Incomplete]
-Other documents present: [list]
-Missing recommended disclosures: [list]
+TDS (Transfer Disclosure Statement): [Present and executed / Present unsigned / Missing]
+SPQ (Seller Property Questionnaire): [Present and executed / Present unsigned / Missing]
+NHD (Natural Hazard Disclosure): [Present and executed / Present unsigned / Missing]
+AVID-LA (Agent Visual Inspection): [Present and executed / Present unsigned / Missing]
+Preliminary Title Report: [Present / Missing]
+FIRPTA Affidavit: [Present and executed / Present unsigned / Missing]
+Other documents present: [list any additional docs found]
+Missing recommended disclosures: [list any truly missing items]
 
 ----------------------------------------
 
 RISK FLAGS — ITEMS A BUYER'S AGENT WILL CHALLENGE
 
-[For each flag:]
+[For each material risk found in the actual documents:]
 [FLAG TITLE IN ALL CAPS]
-Source: [document name]
+Source: [exact filename]
 Risk Level: [Low / Moderate / High]
 Category: [Legal / Physical / Environmental / Title / Disclosure Gap]
 
-[Description — what a buyer's agent will say, how common it is]
+[Description — what is actually stated in the document, what a buyer's agent will say]
 
 Seller Recommendation:
-[What to do — clarify, repair, disclose proactively, or price accordingly]
+[Specific action — clarify, repair, disclose proactively, or price accordingly]
 
 ----------------------------------------
 
 TITLE & OWNERSHIP REVIEW
 
-[From Preliminary Title Report: vesting, liens, easements, CC&Rs, encumbrances that could delay or kill the deal]
+[From Preliminary Title Report if present: vesting, liens, easements, CC&Rs, encumbrances]
 
 ----------------------------------------
 
 NATURAL HAZARD EXPOSURE
 
-[From NHD: flood zone, fire zone, seismic, liquefaction. For each: insurance implications, disclosure obligations, buyer concern level]
+[From NHD if present: flood zone, fire zone, seismic, liquefaction — insurance implications, disclosure obligations]
 
 ----------------------------------------
 
 MISSING OR VAGUE DISCLOSURES
 
-[Blank, vague, or contradictory seller responses. Missing permits or documentation.]
+[Any blank, vague, or contradictory seller responses found in the actual documents. Missing permits or documentation.]
 
 ----------------------------------------
 
 PRE-LISTING RECOMMENDATIONS
 
 Priority 1 — Must Address Before Listing:
-[list]
+[Specific items based on actual document findings]
 
 Priority 2 — Recommended:
 [list]
@@ -686,7 +683,7 @@ Priority 3 — Optional:
 
 AGENT NOTES FOR LISTING CONSULTATION
 
-[Talking points for Sam/John. Objections to anticipate. Pricing impact. Days on market considerations.]
+[Specific talking points based on actual findings. Objections to anticipate. Pricing impact. Days on market considerations.]
 
 ----------------------------------------
 
@@ -697,7 +694,7 @@ Physical Condition: [Good / Fair / Needs Work]
 Title Status: [Clean / Issues to Resolve]
 Listing Risk: [Low / Moderate / Elevated]
 
-[3-4 sentences summarizing overall readiness and next steps.]
+[3-4 sentences summarizing overall readiness and next steps based on actual document findings.]
 
 ----------------------------------------
 
@@ -711,16 +708,20 @@ Agent License #: ${selectedAgent.dre}
 This report was prepared for seller advisory purposes only and does not constitute legal advice. Agent verification required before listing.`;
 }
 
-function buildConditionPrompt(address,seller,today){
-  return `Generate a complete SMART SELLER PROTECTION REPORT™ — Condition Analysis using ALL uploaded documents.
+function buildConditionPrompt(address, seller, today, fileManifest){
+  return `You have been provided with the following ${uploadedFiles.length} inspection and repair documents for this transaction. ALL of these files are in your vector store — search for each one by name and read it completely before writing the report:
+
+${fileManifest}
+
+STEP 1 — Before writing the report, search for and confirm you have read each file above.
+
+STEP 2 — Generate the complete SMART SELLER PROTECTION REPORT™ using findings from ALL files above.
 
 Property Address: ${address}
 Seller Name: ${seller}
 Date: ${today}
 Prepared By: ${selectedAgent.name} | SZ Real Estate Group
 Agent License #: ${selectedAgent.dre}
-
-Read every document in full — every line of every inspection report, every RFR item. Output the complete report in this exact format:
 
 SMART SELLER PROTECTION REPORT™
 In-Contract Condition Analysis
@@ -735,7 +736,7 @@ Agent License #: ${selectedAgent.dre}
 
 EXECUTIVE SUMMARY
 
-[Overview of condition, inspection findings, RFR status, negotiation position. Note every document reviewed.]
+[Overview of condition, inspection findings, RFR status, negotiation position based on actual documents.]
 
 Overall Condition: [Good / Fair / Needs Work]
 RFR Risk Level: [Low / Moderate / High]
@@ -745,56 +746,51 @@ Negotiation Position: [Strong / Neutral / Challenging]
 
 DOCUMENTS REVIEWED
 
-[List every document with date and inspector/party names]
+[List every file from the manifest and what it contains]
 
 ----------------------------------------
 
 INSPECTION FINDINGS SUMMARY
 
 STRUCTURAL & FOUNDATION
-[findings]
+[Actual findings from inspection reports]
 
 ROOF
-[findings]
+[Actual findings]
 
 ELECTRICAL
-[findings]
+[Actual findings]
 
 PLUMBING
-[findings]
+[Actual findings]
 
 HVAC
-[findings]
+[Actual findings]
 
 PEST & WOOD DESTROYING ORGANISMS
-[Section I vs Section II findings]
+[Section I vs Section II actual findings]
 
 OTHER FINDINGS
-[findings]
+[Any other actual findings]
 
 ----------------------------------------
 
 RFR ANALYSIS — ITEM BY ITEM
 
-[For each item:]
+[For each item in the actual Repair Request documents:]
 [ITEM NAME IN ALL CAPS]
-Buyer Requested: [exact request]
+Buyer Requested: [exact text from RFR]
 Classification: [Legitimate / Aggressive / Unreasonable]
 Seller Recommendation: [Accept / Counter / Decline]
-Rationale: [why — inspection finding, market norms, liability]
+Rationale: [why — based on inspection finding, market norms, liability]
 
 ----------------------------------------
 
 NEGOTIATION STRATEGY
 
-Items to ACCEPT:
-[list with rationale]
-
-Items to COUNTER:
-[list with suggested counter-position]
-
-Items to DECLINE:
-[list with rationale]
+Items to ACCEPT: [list with rationale based on actual findings]
+Items to COUNTER: [list with suggested counter-position]
+Items to DECLINE: [list with rationale]
 
 Overall Recommended Response: [Credit / Repairs / Combination / As-Is]
 Suggested Credit Amount: [range only, if applicable]
@@ -803,13 +799,13 @@ Suggested Credit Amount: [range only, if applicable]
 
 COE RISK ASSESSMENT
 
-[Items that could jeopardize closing — financing, permits, pest clearance, timeline risks]
+[Actual items from documents that could jeopardize closing]
 
 ----------------------------------------
 
 AGENT NOTES FOR SELLER CONVERSATION
 
-[How to present, emotional considerations, where seller has leverage, how to frame the recommendation]
+[How to present these specific findings. Where seller has leverage.]
 
 ----------------------------------------
 
@@ -819,7 +815,7 @@ Inspection Results: [Better / As Expected / Worse than expected for age and pric
 RFR Reasonableness: [Reasonable / Slightly aggressive / Very aggressive]
 Recommended Action: [Accept as submitted / Counter / Decline and defend]
 
-[3-4 sentence summary on negotiation position and path to closing.]
+[3-4 sentence summary based on actual document findings.]
 
 ----------------------------------------
 
@@ -833,7 +829,7 @@ Agent License #: ${selectedAgent.dre}
 This report was prepared for seller advisory purposes only and does not constitute legal advice. Agent verification required before COE.`;
 }
 
-// ── COPY / PRINT / SEND / RESET ──
+// ── COPY / PRINT ──
 function copyReport(){
   navigator.clipboard.writeText(generatedReport).then(()=>{
     const b=event.target;b.textContent='Copied!';setTimeout(()=>b.textContent='Copy Report',2000);
@@ -844,25 +840,56 @@ function printReport(){
   w.document.write(`<html><head><title>Smart Seller Protection Report</title><style>body{font-family:Georgia,serif;font-size:13px;line-height:1.8;max-width:700px;margin:40px auto;color:#111;}pre{white-space:pre-wrap;font-family:Georgia,serif;}</style></head><body><pre>${generatedReport.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</pre></body></html>`);
   w.document.close();w.print();
 }
+
+// ── SEND TO PABBLY ──
 async function sendToPabbly(){
   const address=document.getElementById('propAddress').value.trim();
   const seller=document.getElementById('sellerName').value.trim();
   const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
   const ps=document.getElementById('pabblyStatus');
   const url=selectedMode==='disclosure'?PABBLY_DISCLOSURE:PABBLY_CONDITION;
+
   ps.className='pabbly-status sending';
   ps.innerHTML='<div style="width:15px;height:15px;border:2px solid rgba(34,85,170,0.2);border-top-color:#2255aa;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;"></div>&nbsp;Sending to Google Drive via Pabbly…';
+
   const streetOnly=address.split(/,|\s+(?:Sacramento|Rocklin|Elk Grove|Folsom|Roseville|Citrus Heights|Rancho Cordova)/i)[0].trim();
+
+  const payload={
+    report_mode:    selectedMode,
+    property_address: address,
+    street_address:   streetOnly,
+    seller_name:      seller,
+    date:             today,
+    agent_name:       selectedAgent.name,
+    agent_dre:        selectedAgent.dre,
+    brokerage_name:   'SZ Real Estate Group',
+    report_body:      generatedReport
+  };
+
+  console.log('Sending to Pabbly:', url, JSON.stringify(payload).substring(0,200));
+
   try{
-    await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-      report_mode:selectedMode,property_address:address,street_address:streetOnly,
-      seller_name:seller,date:today,agent_name:selectedAgent.name,agent_dre:selectedAgent.dre,
-      brokerage_name:'SZ Real Estate Group',report_body:generatedReport
-    })});
-    ps.className='pabbly-status sent';ps.innerHTML='✓ Sent to Pabbly — Google Doc will appear in your Drive folder shortly.';
-    document.getElementById('pabblyBtn').textContent='✓ Sent to Drive';document.getElementById('pabblyBtn').disabled=true;
-  } catch(e){ps.className='pabbly-status failed';ps.innerHTML='✗ Failed to reach Pabbly.';}
+    const res = await fetch(url,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    console.log('Pabbly response status:', res.status);
+    const text = await res.text();
+    console.log('Pabbly response body:', text.substring(0,300));
+
+    ps.className='pabbly-status sent';
+    ps.innerHTML='✓ Sent to Pabbly — Google Doc will appear in your Drive folder shortly.';
+    document.getElementById('pabblyBtn').textContent='✓ Sent to Drive';
+    document.getElementById('pabblyBtn').disabled=true;
+  } catch(e){
+    console.error('Pabbly error:', e);
+    ps.className='pabbly-status failed';
+    ps.innerHTML='✗ Failed to reach Pabbly: '+e.message;
+  }
 }
+
+// ── RESET ──
 function resetForm(){
   document.querySelectorAll('.agent-card').forEach(c=>c.classList.remove('selected'));
   ['modeDisclosure','modeCondition'].forEach(id=>document.getElementById(id).classList.remove('selected-disclosure','selected-condition'));
