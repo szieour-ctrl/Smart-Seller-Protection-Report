@@ -23,11 +23,20 @@ function base64url(str) {
 async function getGoogleAccessToken() {
   const rawKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
   if (!rawKey) throw new Error('GOOGLE_SERVICE_ACCOUNT_KEY not set');
+  console.log('[SSPR] Key length:', rawKey.length, '| starts:', rawKey.substring(0,15));
   let key;
-  try { key = JSON.parse(rawKey); }
-  catch(e) {
-    try { key = JSON.parse(rawKey.trim().replace(/^"|"$/g, '')); }
-    catch(e2) { throw new Error('Failed to parse GOOGLE_SERVICE_ACCOUNT_KEY'); }
+  try {
+    key = JSON.parse(rawKey);
+    console.log('[SSPR] Key parsed OK, email:', key.client_email);
+  } catch(e) {
+    console.log('[SSPR] Parse attempt 1 failed:', e.message);
+    try {
+      const trimmed = rawKey.trim().replace(/^['"]|['"]$/g, '');
+      key = JSON.parse(trimmed);
+      console.log('[SSPR] Key parsed on attempt 2, email:', key.client_email);
+    } catch(e2) {
+      throw new Error('Key parse failed. Length=' + rawKey.length + ' Starts=' + rawKey.substring(0,40));
+    }
   }
   const privateKey = key.private_key.replace(/\\n/g, '\n');
   const now = Math.floor(Date.now() / 1000);
