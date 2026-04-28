@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Smart Seller Protection Report™</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://apis.google.com/js/api.js" async defer onload="onGapiLoad()"></script>
-<script src="https://accounts.google.com/gsi/client" async defer onload="onGsiLoad()"></script>
 <style>
   :root {
     --navy:#0f1f3d;--navy-mid:#1a3260;--gold:#c8a84b;--gold-light:#e8c96a;
@@ -15,6 +13,7 @@
     --shadow:0 4px 24px rgba(15,31,61,0.10);--shadow-lg:0 12px 48px rgba(15,31,61,0.18);
     --disclosure:#1a5276;--disclosure-light:#d4e6f1;
     --condition:#1e8449;--condition-light:#d5f5e3;
+    --warn:#7d5a00;--warn-bg:#fdf8f0;--warn-border:#e8c97a;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
@@ -28,86 +27,100 @@
   .header-sub{font-size:13px;color:rgba(255,255,255,0.5);margin-top:6px;font-weight:300;}
   .brokerage-line{margin-top:16px;font-size:12px;color:rgba(255,255,255,0.35);letter-spacing:0.5px;}
   main{max-width:860px;margin:0 auto;padding:36px 24px 60px;}
-  .card{background:var(--white);border-radius:12px;box-shadow:var(--shadow);padding:32px;margin-bottom:24px;border:1px solid var(--border);}
-  .card-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:700;color:var(--navy);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
-  .step-num{width:26px;height:26px;background:var(--navy);color:var(--gold);border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;}
+
+  /* SECTION BLOCKS */
+  .section{background:var(--white);border-radius:12px;box-shadow:var(--shadow);margin-bottom:20px;border:1px solid var(--border);overflow:hidden;}
+  .section-header{display:flex;align-items:center;gap:12px;padding:20px 28px;border-bottom:1px solid var(--border);background:var(--cream);}
+  .section-num{width:28px;height:28px;background:var(--navy);color:var(--gold);border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .section-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:var(--navy);}
+  .section-body{padding:24px 28px;}
+
+  /* AGENT GRID */
+  .agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
   .agent-card{border:2px solid var(--border);border-radius:10px;padding:14px 12px;cursor:pointer;text-align:center;transition:all 0.2s;background:var(--cream);}
   .agent-card:hover{border-color:var(--navy-mid);background:var(--white);}
-  .agent-card.selected{border-color:var(--gold);background:var(--navy);box-shadow:0 4px 16px rgba(15,31,61,0.2);}
-  .agent-initial{width:38px;height:38px;border-radius:50%;background:var(--navy-mid);color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;transition:background 0.2s;}
+  .agent-card.selected{border-color:var(--gold);background:var(--navy);}
+  .agent-initial{width:36px;height:36px;border-radius:50%;background:var(--navy-mid);color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 7px;transition:background 0.2s;}
   .agent-card.selected .agent-initial{background:var(--gold);color:var(--navy);}
-  .agent-name{font-size:12px;font-weight:600;color:var(--text);transition:color 0.2s;line-height:1.3;}
+  .agent-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.3;}
   .agent-card.selected .agent-name{color:var(--white);}
-  .agent-dre{font-size:10px;color:var(--text-muted);margin-top:3px;}
+  .agent-dre{font-size:10px;color:var(--text-muted);margin-top:2px;}
   .agent-card.selected .agent-dre{color:rgba(255,255,255,0.5);}
-  .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-  .mode-card{border:2.5px solid var(--border);border-radius:12px;padding:24px 20px;cursor:pointer;transition:all 0.2s;background:var(--cream);position:relative;overflow:hidden;}
-  .mode-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--border);transition:background 0.2s;}
-  .mode-card:hover{background:var(--white);transform:translateY(-2px);box-shadow:var(--shadow);}
-  .mode-card.selected-disclosure{border-color:var(--disclosure);background:var(--white);}
-  .mode-card.selected-disclosure::before{background:var(--disclosure);}
-  .mode-card.selected-condition{border-color:var(--condition);background:var(--white);}
-  .mode-card.selected-condition::before{background:var(--condition);}
-  .mode-icon{font-size:32px;margin-bottom:12px;}
-  .mode-label{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:var(--navy);margin-bottom:6px;}
-  .mode-card.selected-disclosure .mode-label{color:var(--disclosure);}
-  .mode-card.selected-condition .mode-label{color:var(--condition);}
-  .mode-desc{font-size:12px;color:var(--text-muted);line-height:1.5;}
-  .mode-reads{margin-top:10px;font-size:11px;font-weight:600;color:var(--text-muted);}
-  .mode-card.selected-disclosure .mode-reads{color:var(--disclosure);}
-  .mode-card.selected-condition .mode-reads{color:var(--condition);}
-  .mode-badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border-radius:10px;margin-bottom:10px;}
-  .badge-disclosure{background:var(--disclosure-light);color:var(--disclosure);}
-  .badge-condition{background:var(--condition-light);color:var(--condition);}
-  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-  .form-group{display:flex;flex-direction:column;gap:6px;}
-  label{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);}
+
+  /* MODE GRID */
+  .mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .mode-card{border:2.5px solid var(--border);border-radius:10px;padding:20px 18px;cursor:pointer;transition:all 0.2s;background:var(--cream);position:relative;overflow:hidden;}
+  .mode-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--border);}
+  .mode-card:hover{background:var(--white);transform:translateY(-1px);}
+  .mode-card.sel-disc{border-color:var(--disclosure);background:var(--white);}
+  .mode-card.sel-disc::before{background:var(--disclosure);}
+  .mode-card.sel-cond{border-color:var(--condition);background:var(--white);}
+  .mode-card.sel-cond::before{background:var(--condition);}
+  .mode-badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border-radius:10px;margin-bottom:8px;}
+  .badge-d{background:var(--disclosure-light);color:var(--disclosure);}
+  .badge-c{background:var(--condition-light);color:var(--condition);}
+  .mode-icon{font-size:26px;margin-bottom:8px;}
+  .mode-label{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+  .sel-disc .mode-label{color:var(--disclosure);}
+  .sel-cond .mode-label{color:var(--condition);}
+  .mode-desc{font-size:11px;color:var(--text-muted);line-height:1.5;}
+
+  /* FORM */
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .form-grid.three{grid-template-columns:1fr 1fr 1fr;}
+  .form-group{display:flex;flex-direction:column;gap:5px;}
+  .form-group.full{grid-column:1/-1;}
+  label{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-muted);}
   input,select{font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--cream);border:1.5px solid var(--border);border-radius:8px;padding:10px 14px;outline:none;transition:border-color 0.2s;width:100%;}
   input:focus,select:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(15,31,61,0.08);background:var(--white);}
-  .drive-section{border:2px solid var(--border);border-radius:12px;padding:24px;background:var(--cream);margin-bottom:0;}
-  .drive-section.mode-disclosure{border-color:rgba(26,82,118,0.3);background:rgba(26,82,118,0.03);}
-  .drive-section.mode-condition{border-color:rgba(30,132,73,0.3);background:rgba(30,132,73,0.03);}
-  .drive-section-title{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;color:var(--navy);margin-bottom:6px;}
-  .drive-section-hint{font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.5;}
-  .drive-btn{display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:10px 22px;border-radius:8px;border:2px solid var(--border);background:var(--white);color:var(--navy);cursor:pointer;transition:all 0.2s;}
-  .drive-btn:hover{border-color:var(--navy);}
-  .drive-btn.selected{border-color:var(--success);background:rgba(42,125,79,0.05);color:var(--success);}
-  .folder-status{margin-top:10px;font-size:12px;color:var(--text-muted);font-style:italic;}
-  .submit-btn{width:100%;padding:17px;background:var(--navy);color:var(--white);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;letter-spacing:0.5px;cursor:pointer;transition:all 0.2s;}
+  .hint{font-size:10px;color:var(--text-muted);margin-top:2px;}
+
+  /* TOGGLE GRID */
+  .toggle-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .toggle-item{display:flex;align-items:center;justify-content:space-between;background:var(--cream);border:1.5px solid var(--border);border-radius:8px;padding:12px 16px;}
+  .toggle-label{font-size:13px;font-weight:600;color:var(--navy);}
+  .toggle-hint{font-size:10px;color:var(--text-muted);margin-top:2px;}
+  .toggle-btns{display:flex;gap:4px;}
+  .toggle-btn{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:5px 14px;border-radius:6px;border:1.5px solid var(--border);background:var(--white);color:var(--text-muted);cursor:pointer;transition:all 0.15s;}
+  .toggle-btn.active-no{background:var(--navy);border-color:var(--navy);color:var(--white);}
+  .toggle-btn.active-yes{background:var(--gold);border-color:var(--gold);color:var(--navy);}
+
+  /* SUBMIT */
+  .submit-btn{width:100%;padding:16px;background:var(--navy);color:var(--white);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;letter-spacing:0.5px;cursor:pointer;transition:all 0.2s;margin-top:4px;}
   .submit-btn:hover:not(:disabled){background:var(--navy-mid);box-shadow:var(--shadow-lg);transform:translateY(-1px);}
   .submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
-  .submit-btn.btn-disclosure{background:var(--disclosure);}
-  .submit-btn.btn-disclosure:hover:not(:disabled){background:#154360;}
-  .submit-btn.btn-condition{background:var(--condition);}
-  .submit-btn.btn-condition:hover:not(:disabled){background:#186a3b;}
-  .status-bar{display:none;align-items:center;gap:12px;padding:14px 18px;border-radius:8px;margin-top:16px;font-size:13px;font-weight:500;}
+  .submit-btn.btn-disc{background:var(--disclosure);}
+  .submit-btn.btn-disc:hover:not(:disabled){background:#154360;}
+  .submit-btn.btn-cond{background:var(--condition);}
+  .submit-btn.btn-cond:hover:not(:disabled){background:#186a3b;}
+  .status-bar{display:none;align-items:center;gap:12px;padding:14px 18px;border-radius:8px;margin-top:14px;font-size:13px;font-weight:500;}
   .status-bar.loading{display:flex;background:rgba(15,31,61,0.06);color:var(--navy);border:1px solid rgba(15,31,61,0.12);}
   .status-bar.error{display:flex;background:#fdf0ee;color:var(--danger);border:1px solid #f5c0bb;}
   .spinner{width:18px;height:18px;border:2.5px solid rgba(15,31,61,0.15);border-top-color:var(--navy);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
   @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* CONFIRMATION */
   .confirmation{display:none;background:var(--white);border-radius:12px;box-shadow:var(--shadow);border:1px solid var(--border);overflow:hidden;margin-top:8px;}
-  .confirmation-header{padding:28px 32px;display:flex;align-items:center;gap:20px;}
-  .confirmation-header.disclosure-bg{background:var(--disclosure);}
-  .confirmation-header.condition-bg{background:var(--condition);}
-  .conf-icon{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
-  .conf-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--white);}
-  .conf-sub{font-size:13px;color:rgba(255,255,255,0.7);margin-top:3px;}
-  .confirmation-body{padding:28px 32px;}
-  .conf-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
-  .conf-item-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;}
-  .conf-item-value{font-size:14px;font-weight:600;color:var(--navy);}
-  .conf-note{background:var(--cream);border-radius:8px;padding:16px 20px;font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:20px;}
+  .conf-header{padding:24px 28px;display:flex;align-items:center;gap:16px;}
+  .conf-header.disc-bg{background:var(--disclosure);}
+  .conf-header.cond-bg{background:var(--condition);}
+  .conf-icon{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .conf-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--white);}
+  .conf-sub{font-size:12px;color:rgba(255,255,255,0.7);margin-top:2px;}
+  .conf-body{padding:24px 28px;}
+  .conf-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+  .conf-label{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px;}
+  .conf-value{font-size:14px;font-weight:600;color:var(--navy);}
+  .conf-note{background:var(--cream);border-radius:8px;padding:14px 18px;font-size:12px;color:var(--text-muted);line-height:1.6;margin-bottom:16px;}
   .conf-note strong{color:var(--navy);}
-  .conf-what{margin-bottom:20px;}
-  .conf-what-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;}
-  .conf-what ul{list-style:none;display:flex;flex-direction:column;gap:6px;}
-  .conf-what li{font-size:13px;color:var(--text-muted);padding-left:20px;position:relative;}
-  .conf-what li::before{content:'→';position:absolute;left:0;color:var(--gold);}
-  .reset-btn{background:transparent;border:2px solid var(--navy);color:var(--navy);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:10px 24px;border-radius:8px;cursor:pointer;transition:all 0.15s;}
+  .reset-btn{background:transparent;border:2px solid var(--navy);color:var(--navy);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:9px 22px;border-radius:8px;cursor:pointer;transition:all 0.15s;}
   .reset-btn:hover{background:var(--navy);color:var(--white);}
-  .step-hidden{display:none;}
-  @media(max-width:600px){.mode-grid{grid-template-columns:1fr;}.form-row{grid-template-columns:1fr;}.header-title{font-size:26px;}.conf-detail-grid{grid-template-columns:1fr;}}
+
+  @media(max-width:600px){
+    .mode-grid,.form-grid,.form-grid.three,.toggle-grid,.conf-grid{grid-template-columns:1fr;}
+    .header-title{font-size:26px;}
+    .section-body{padding:18px 20px;}
+  }
 </style>
 </head>
 <body>
@@ -122,97 +135,154 @@
 <main>
 
   <!-- STEP 1: AGENT -->
-  <div class="card">
-    <div class="card-title"><span class="step-num">1</span> Select Agent</div>
-    <div class="agent-grid" id="agentGrid"></div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">Select Agent</div>
+    </div>
+    <div class="section-body">
+      <div class="agent-grid" id="agentGrid"></div>
+    </div>
   </div>
 
-  <!-- STEP 2: MODE -->
-  <div class="card">
-    <div class="card-title"><span class="step-num">2</span> Select Report Type</div>
-    <div class="mode-grid">
-      <div class="mode-card" id="modeDisclosure" onclick="selectMode('disclosure')">
-        <div class="mode-badge badge-disclosure">Pre-Listing</div>
-        <div class="mode-icon">📋</div>
-        <div class="mode-label">Disclosure Review</div>
-        <div class="mode-desc">Analyzes seller disclosure package before listing. Identifies risk flags, missing documents, and items a buyer's agent will challenge.</div>
-        <div class="mode-reads">Reads: TDS · SPQ · NHD · AVID-LA · Prelim Title</div>
-      </div>
-      <div class="mode-card" id="modeCondition" onclick="selectMode('condition')">
-        <div class="mode-badge badge-condition">In-Contract</div>
-        <div class="mode-icon">🔍</div>
-        <div class="mode-label">Condition Analysis</div>
-        <div class="mode-desc">Evaluates inspection findings and repair requests. Recommends what to accept, counter, or decline with negotiation strategy.</div>
-        <div class="mode-reads">Reads: Inspection Reports · Pest · RFRs · AVID-BA</div>
+  <!-- STEP 2: REPORT TYPE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title">Select Report Type</div>
+    </div>
+    <div class="section-body">
+      <div class="mode-grid">
+        <div class="mode-card" id="modeDisc" onclick="selectMode('disclosure')">
+          <div class="mode-badge badge-d">Pre-Listing</div>
+          <div class="mode-icon">📋</div>
+          <div class="mode-label">Disclosure Review</div>
+          <div class="mode-desc">Analyzes seller disclosure package before listing. Identifies risk flags, missing documents, and items a buyer's agent will challenge.</div>
+        </div>
+        <div class="mode-card" id="modeCond" onclick="selectMode('condition')">
+          <div class="mode-badge badge-c">In-Contract</div>
+          <div class="mode-icon">🔍</div>
+          <div class="mode-label">Condition Analysis</div>
+          <div class="mode-desc">Evaluates inspection findings and repair requests. Recommends what to accept, counter, or decline with negotiation strategy.</div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- STEP 3: PROPERTY & FOLDER -->
-  <div class="card step-hidden" id="step3">
-    <div class="card-title"><span class="step-num">3</span> Property & Seller</div>
-    <div class="form-row" style="margin-bottom:16px;">
-      <div class="form-group">
-        <label>Property Address</label>
-        <input type="text" id="propAddress" placeholder="e.g. 777 Lucky Ln, Roseville CA 95747" />
-      </div>
-      <div class="form-group">
-        <label>Seller Name</label>
-        <input type="text" id="sellerName" placeholder="e.g. Gracey Wixon" />
-      </div>
+  <!-- STEP 3: TRANSACTION INFO -->
+  <div class="section" id="step3" style="display:none;">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div class="section-title">Transaction Info</div>
     </div>
-
-    <!-- Drive folder picker -->
-    <div class="drive-section" id="driveFolderSection">
-      <div class="drive-section-title" id="driveSectionTitle">Select Transaction Folder</div>
-      <div class="drive-section-hint" id="driveSectionHint">Select the client's transaction folder. Claude will read the documents server-side — no waiting in the browser.</div>
-      <button class="drive-btn" id="driveFolderBtn" onclick="openDriveFolderPicker()">
-        <svg width="16" height="16" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
-          <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
-          <path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/>
-          <path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/>
-          <path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>
-          <path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>
-          <path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 27h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
-        </svg>
-        <span id="driveBtnText">Select Transaction Folder from Drive</span>
-      </button>
-      <div class="folder-status" id="folderStatus"></div>
+    <div class="section-body">
+      <div class="form-grid" style="margin-bottom:14px;">
+        <div class="form-group">
+          <label>Seller Last Name</label>
+          <input type="text" id="sellerLastName" placeholder="e.g. Wixon" />
+          <div class="hint">Used to locate the Google Drive folder</div>
+        </div>
+        <div class="form-group">
+          <label>Property Address</label>
+          <input type="text" id="propAddress" placeholder="e.g. 777 Lucky Ln, Roseville CA 95747" />
+        </div>
+        <div class="form-group">
+          <label>Year Built</label>
+          <input type="text" id="yearBuilt" placeholder="e.g. 1978" />
+          <div class="hint">Pre-1978 triggers Lead Paint disclosure check</div>
+        </div>
+        <div class="form-group">
+          <label>Report Email</label>
+          <input type="email" id="reportEmail" placeholder="e.g. sam@szrealestategroup.com" />
+          <div class="hint">Completed report sent here</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- STEP 4: SUBMIT -->
-  <div class="card step-hidden" id="step4">
-    <div class="card-title"><span class="step-num">4</span> Generate Report</div>
-    <button class="submit-btn" id="submitBtn" onclick="submitReport()">✦ Generate Smart Seller Protection Report™</button>
-    <div class="status-bar" id="statusBar">
-      <div class="spinner"></div>
-      <span id="statusText">Submitting…</span>
+  <!-- STEP 4: PROPERTY CONDITIONS -->
+  <div class="section" id="step4" style="display:none;">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div class="section-title">Property Conditions</div>
+    </div>
+    <div class="section-body">
+      <div class="toggle-grid">
+        <div class="toggle-item">
+          <div>
+            <div class="toggle-label">HOA Present</div>
+            <div class="toggle-hint">Triggers HOA document review</div>
+          </div>
+          <div class="toggle-btns">
+            <button class="toggle-btn active-no" id="hoa-no" onclick="setToggle('hoa','no')">No</button>
+            <button class="toggle-btn" id="hoa-yes" onclick="setToggle('hoa','yes')">Yes</button>
+          </div>
+        </div>
+        <div class="toggle-item">
+          <div>
+            <div class="toggle-label">Pool or Spa</div>
+            <div class="toggle-hint">Triggers pool safety disclosure</div>
+          </div>
+          <div class="toggle-btns">
+            <button class="toggle-btn active-no" id="pool-no" onclick="setToggle('pool','no')">No</button>
+            <button class="toggle-btn" id="pool-yes" onclick="setToggle('pool','yes')">Yes</button>
+          </div>
+        </div>
+        <div class="toggle-item">
+          <div>
+            <div class="toggle-label">55+ Community</div>
+            <div class="toggle-hint">Triggers age verification disclosures</div>
+          </div>
+          <div class="toggle-btns">
+            <button class="toggle-btn active-no" id="c55-no" onclick="setToggle('c55','no')">No</button>
+            <button class="toggle-btn" id="c55-yes" onclick="setToggle('c55','yes')">Yes</button>
+          </div>
+        </div>
+        <div class="toggle-item">
+          <div>
+            <div class="toggle-label">Well or Septic</div>
+            <div class="toggle-hint">Triggers water/septic disclosures</div>
+          </div>
+          <div class="toggle-btns">
+            <button class="toggle-btn active-no" id="ws-no" onclick="setToggle('ws','no')">No</button>
+            <button class="toggle-btn" id="ws-yes" onclick="setToggle('ws','yes')">Yes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5: SUBMIT -->
+  <div class="section" id="step5" style="display:none;">
+    <div class="section-body">
+      <button class="submit-btn" id="submitBtn" onclick="submitReport()">✦ Generate Smart Seller Protection Report™</button>
+      <div class="status-bar" id="statusBar">
+        <div class="spinner"></div>
+        <span id="statusText">Submitting…</span>
+      </div>
     </div>
   </div>
 
   <!-- CONFIRMATION -->
   <div class="confirmation" id="confirmation">
-    <div class="confirmation-header" id="confHeader">
+    <div class="conf-header" id="confHeader">
       <div class="conf-icon">✓</div>
       <div>
-        <div class="conf-title">Report Submitted</div>
-        <div class="conf-sub">Claude is reading your documents now</div>
+        <div class="conf-title">Report Submitted Successfully</div>
+        <div class="conf-sub">Claude is reading the documents now — est. 3–5 minutes</div>
       </div>
     </div>
-    <div class="confirmation-body">
-      <div class="conf-detail-grid">
-        <div><div class="conf-item-label">Property</div><div class="conf-item-value" id="confAddress">—</div></div>
-        <div><div class="conf-item-label">Seller</div><div class="conf-item-value" id="confSeller">—</div></div>
-        <div><div class="conf-item-label">Report Type</div><div class="conf-item-value" id="confMode">—</div></div>
-        <div><div class="conf-item-label">Est. Completion</div><div class="conf-item-value">3–5 minutes</div></div>
+    <div class="conf-body">
+      <div class="conf-grid">
+        <div><div class="conf-label">Property</div><div class="conf-value" id="confAddress">—</div></div>
+        <div><div class="conf-label">Seller</div><div class="conf-value" id="confSeller">—</div></div>
+        <div><div class="conf-label">Report Type</div><div class="conf-value" id="confMode">—</div></div>
+        <div><div class="conf-label">Agent</div><div class="conf-value" id="confAgent">—</div></div>
+        <div><div class="conf-label">Report Email</div><div class="conf-value" id="confEmail">—</div></div>
+        <div><div class="conf-label">Est. Completion</div><div class="conf-value">3–5 minutes</div></div>
       </div>
       <div class="conf-note">
-        <strong>Your report is being generated.</strong> Claude is downloading and reading every PDF in the transaction folder server-side — no browser timeout, no size limits. The completed report will be saved to your Google Drive via Pabbly when ready.
-      </div>
-      <div class="conf-what">
-        <div class="conf-what-title">What Claude is reading right now</div>
-        <ul id="confFileList"></ul>
+        <strong>What happens next:</strong> Claude is downloading and reading every PDF in the transaction folder server-side. When complete, the report will be saved as a Google Doc in the A5 folder and emailed to the address above.
       </div>
       <button class="reset-btn" onclick="resetForm()">← Start New Report</button>
     </div>
@@ -220,180 +290,143 @@
 
 </main>
 <script>
-// ── CONFIG ──
-const GOOGLE_API_KEY   = 'AIzaSyAZzMGptybfWqP_FS8df2t4qhVdO_VkoT0';
-const GOOGLE_CLIENT_ID = '96917389365-hclaoi15jmlq4uocga79p3dn2s17j6td.apps.googleusercontent.com';
-const DRIVE_SCOPE      = 'https://www.googleapis.com/auth/drive.readonly';
-
 const AGENTS = [
-  { name:'Samuel K. Zieour', dre:'01397303', initials:'SZ' },
-  { name:'John P. Klein',    dre:'00994179', initials:'JK' },
+  { name:'Samuel K. Zieour', dre:'01397303', initials:'SZ', email:'sam@szrealestategroup.com' },
+  { name:'John P. Klein',    dre:'00994179', initials:'JK', email:'john@szrealestategroup.com' },
 ];
-let selectedAgent=null, selectedMode=null;
-let selectedFolderId=null, selectedFolderName=null;
-let pickerApiLoaded=false, gapiInited=false, tokenClient=null, driveAccessToken=null, gapiReady=false, gsiReady=false;
 
-// ── GOOGLE INIT ──
-function onGapiLoad(){
-  gapiReady=true;
-  gapi.load('picker',()=>{pickerApiLoaded=true;});
-  gapi.load('client',async()=>{await gapi.client.init({});gapiInited=true;});
-  maybeInitTokenClient();
-}
-function onGsiLoad(){gsiReady=true;maybeInitTokenClient();}
-function maybeInitTokenClient(){
-  if(!gapiReady||!gsiReady||tokenClient) return;
-  tokenClient=google.accounts.oauth2.initTokenClient({
-    client_id:GOOGLE_CLIENT_ID, scope:DRIVE_SCOPE,
-    callback:(resp)=>{
-      const s=document.getElementById('folderStatus');
-      if(resp.error){s.textContent='⚠️ Google sign-in failed. Please try again.';return;}
-      driveAccessToken=resp.access_token; s.textContent=''; showFolderPicker();
-    }
-  });
-}
+let selectedAgent = null;
+let selectedMode  = null;
+const toggleState = { hoa:'no', pool:'no', c55:'no', ws:'no' };
 
 // ── AGENT CARDS ──
-const agentGrid=document.getElementById('agentGrid');
-AGENTS.forEach((agent,i)=>{
-  const card=document.createElement('div');
-  card.className='agent-card';
-  card.innerHTML=`<div class="agent-initial">${agent.initials}</div><div class="agent-name">${agent.name}</div><div class="agent-dre">DRE #${agent.dre}</div>`;
-  card.onclick=()=>{document.querySelectorAll('.agent-card').forEach(c=>c.classList.remove('selected'));card.classList.add('selected');selectedAgent=AGENTS[i];};
+const agentGrid = document.getElementById('agentGrid');
+AGENTS.forEach((agent, i) => {
+  const card = document.createElement('div');
+  card.className = 'agent-card';
+  card.innerHTML = `<div class="agent-initial">${agent.initials}</div>
+    <div class="agent-name">${agent.name}</div>
+    <div class="agent-dre">DRE #${agent.dre}</div>`;
+  card.onclick = () => {
+    document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedAgent = AGENTS[i];
+    document.getElementById('reportEmail').value = agent.email;
+  };
   agentGrid.appendChild(card);
 });
 
 // ── MODE ──
-function selectMode(mode){
-  selectedMode=mode;
-  document.getElementById('modeDisclosure').classList.remove('selected-disclosure','selected-condition');
-  document.getElementById('modeCondition').classList.remove('selected-disclosure','selected-condition');
-  if(mode==='disclosure'){
-    document.getElementById('modeDisclosure').classList.add('selected-disclosure');
-    document.getElementById('driveSectionTitle').textContent='Select Transaction Folder — Auto-reads A2 Disclosures';
-    document.getElementById('driveSectionHint').textContent="Select the client's transaction folder. Claude reads every document in the A2. Disclosures & Reports subfolder server-side.";
-    document.getElementById('driveFolderSection').className='drive-section mode-disclosure';
-    document.getElementById('submitBtn').className='submit-btn btn-disclosure';
-    document.getElementById('submitBtn').textContent='✦ Generate Disclosure Review Report';
+function selectMode(mode) {
+  selectedMode = mode;
+  document.getElementById('modeDisc').className = 'mode-card' + (mode === 'disclosure' ? ' sel-disc' : '');
+  document.getElementById('modeCond').className = 'mode-card' + (mode === 'condition' ? ' sel-cond' : '');
+
+  const btn = document.getElementById('submitBtn');
+  if (mode === 'disclosure') {
+    btn.className = 'submit-btn btn-disc';
+    btn.textContent = '✦ Generate Disclosure Review Report';
   } else {
-    document.getElementById('modeCondition').classList.add('selected-condition');
-    document.getElementById('driveSectionTitle').textContent='Select Transaction Folder — Auto-reads A3 Inspections';
-    document.getElementById('driveSectionHint').textContent="Select the client's transaction folder. Claude reads every document in the A3. Inspection Reports subfolder server-side.";
-    document.getElementById('driveFolderSection').className='drive-section mode-condition';
-    document.getElementById('submitBtn').className='submit-btn btn-condition';
-    document.getElementById('submitBtn').textContent='✦ Generate Condition Analysis Report';
+    btn.className = 'submit-btn btn-cond';
+    btn.textContent = '✦ Generate Condition Analysis Report';
   }
-  selectedFolderId=null; selectedFolderName=null;
-  document.getElementById('folderStatus').textContent='';
-  document.getElementById('driveFolderBtn').className='drive-btn';
-  document.getElementById('driveBtnText').textContent='Select Transaction Folder from Drive';
-  ['step3','step4'].forEach(id=>document.getElementById(id).classList.remove('step-hidden'));
+
+  ['step3','step4','step5'].forEach(id => document.getElementById(id).style.display = 'block');
 }
 
-// ── DRIVE PICKER ──
-function openDriveFolderPicker(){
-  const s=document.getElementById('folderStatus');
-  if(!gapiReady||!gsiReady){s.textContent='⏳ Loading Google Drive… please try again in a moment.';return;}
-  if(!tokenClient||!pickerApiLoaded||!gapiInited){s.textContent='⏳ Connecting to Google Drive…';setTimeout(openDriveFolderPicker,1000);return;}
-  s.textContent='';
-  if(!driveAccessToken){tokenClient.requestAccessToken({prompt:'select_account'});return;}
-  showFolderPicker();
-}
-function showFolderPicker(){
-  const view=new google.picker.DocsView(google.picker.ViewId.FOLDERS).setIncludeFolders(true).setSelectFolderEnabled(true).setOwnedByMe(true);
-  new google.picker.PickerBuilder().setAppId('96917389365').setOAuthToken(driveAccessToken).setDeveloperKey(GOOGLE_API_KEY).addView(view).setTitle('Select the client transaction folder').setCallback(pickerCallback).build().setVisible(true);
-}
-function pickerCallback(data){
-  if(data.action!==google.picker.Action.PICKED) return;
-  const folder=data.docs[0];
-  selectedFolderId=folder.id; selectedFolderName=folder.name;
-  document.getElementById('folderStatus').textContent=`✅ Selected: ${folder.name}`;
-  document.getElementById('driveFolderBtn').className='drive-btn selected';
-  document.getElementById('driveBtnText').textContent=folder.name;
+// ── TOGGLES ──
+function setToggle(key, val) {
+  toggleState[key] = val;
+  const ids = { hoa:'hoa', pool:'pool', c55:'c55', ws:'ws' };
+  const k = ids[key];
+  document.getElementById(`${k}-no`).className  = 'toggle-btn' + (val === 'no'  ? ' active-no'  : '');
+  document.getElementById(`${k}-yes`).className = 'toggle-btn' + (val === 'yes' ? ' active-yes' : '');
 }
 
 // ── SUBMIT ──
-async function submitReport(){
-  if(!selectedAgent){alert('Please select an agent.');return;}
-  if(!selectedMode){alert('Please select a report type.');return;}
-  const address=document.getElementById('propAddress').value.trim();
-  const seller=document.getElementById('sellerName').value.trim();
-  if(!address||!seller){alert('Please enter property address and seller name.');return;}
-  if(!selectedFolderId){alert('Please select a transaction folder from Google Drive.');return;}
+async function submitReport() {
+  if (!selectedAgent) { alert('Please select an agent.'); return; }
+  if (!selectedMode)  { alert('Please select a report type.'); return; }
 
-  const btn=document.getElementById('submitBtn');
-  const statusBar=document.getElementById('statusBar');
-  const statusText=document.getElementById('statusText');
-  btn.disabled=true; statusBar.className='status-bar loading'; statusText.textContent='Submitting report request…';
+  const sellerLastName = document.getElementById('sellerLastName').value.trim();
+  const address        = document.getElementById('propAddress').value.trim();
+  const yearBuilt      = document.getElementById('yearBuilt').value.trim();
+  const reportEmail    = document.getElementById('reportEmail').value.trim();
 
-  const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-  const webhookUrl=process.env?.PABBLY_DISCLOSURE_WEBHOOK||''; // resolved server-side
+  if (!sellerLastName) { alert('Please enter the seller last name.'); return; }
+  if (!address)        { alert('Please enter the property address.'); return; }
+  if (!reportEmail)    { alert('Please enter a report email.'); return; }
 
-  const payload={
-    folderId:      selectedFolderId,
-    folderName:    selectedFolderName,
-    reportMode:    selectedMode,
+  const btn       = document.getElementById('submitBtn');
+  const statusBar = document.getElementById('statusBar');
+  const statusText= document.getElementById('statusText');
+  btn.disabled = true;
+  statusBar.className = 'status-bar loading';
+  statusText.textContent = 'Submitting report request…';
+
+  const today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+  const payload = {
+    sellerLastName,
     address,
-    seller,
+    yearBuilt,
+    reportMode:    selectedMode,
     agentName:     selectedAgent.name,
     agentDre:      selectedAgent.dre,
     date:          today,
     brokerageName: 'SZ Real Estate Group',
-    pabblyWebhook: selectedMode==='disclosure' ? 'PABBLY_DISCLOSURE' : 'PABBLY_CONDITION'
+    hoa:           toggleState.hoa,
+    pool:          toggleState.pool,
+    community55:   toggleState.c55,
+    wellSeptic:    toggleState.ws,
+    reportEmail
   };
 
-  try{
-    const res=await fetch('/.netlify/functions/sspr-background',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload)
+  try {
+    const res = await fetch('/.netlify/functions/sspr-background', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
 
-    statusBar.className='status-bar';
+    statusBar.className = 'status-bar';
 
-    if(res.status===202||res.ok){
-      // Show confirmation
-      document.getElementById('confAddress').textContent=address;
-      document.getElementById('confSeller').textContent=seller;
-      document.getElementById('confMode').textContent=selectedMode==='disclosure'?'Disclosure Review':'Condition Analysis';
-      document.getElementById('confHeader').className='confirmation-header '+(selectedMode==='disclosure'?'disclosure-bg':'condition-bg');
-
-      const listEl=document.getElementById('confFileList');
-      listEl.innerHTML='';
-      const items=selectedMode==='disclosure'
-        ?['TDS · SPQ · NHD · FIRPTA · Earthquake','AVID-LA · AVID-BA','Sacramento Disclosures & Disclaimers','SBSA · LPD · Disclosure Cover','All PDFs in A2. Disclosures & Reports']
-        :['Home Inspection Report','Pest Report','RFR / Repair Requests','AVID-BA','All PDFs in A3. Inspection Reports'];
-      items.forEach(item=>{const li=document.createElement('li');li.textContent=item;listEl.appendChild(li);});
-
-      document.getElementById('confirmation').style.display='block';
-      document.getElementById('confirmation').scrollIntoView({behavior:'smooth',block:'start'});
+    if (res.status === 202 || res.ok) {
+      document.getElementById('confAddress').textContent = address;
+      document.getElementById('confSeller').textContent  = sellerLastName;
+      document.getElementById('confMode').textContent    = selectedMode === 'disclosure' ? 'Disclosure Review' : 'Condition Analysis';
+      document.getElementById('confAgent').textContent   = selectedAgent.name;
+      document.getElementById('confEmail').textContent   = reportEmail;
+      document.getElementById('confHeader').className    = 'conf-header ' + (selectedMode === 'disclosure' ? 'disc-bg' : 'cond-bg');
+      document.getElementById('confirmation').style.display = 'block';
+      document.getElementById('confirmation').scrollIntoView({ behavior:'smooth', block:'start' });
     } else {
-      const err=await res.json().catch(()=>({error:`Server error ${res.status}`}));
-      throw new Error(err.error||`Server error ${res.status}`);
+      const err = await res.json().catch(() => ({ error: `Server error ${res.status}` }));
+      throw new Error(err.error || `Server error ${res.status}`);
     }
-  } catch(err){
-    statusBar.className='status-bar error';
-    statusText.textContent=err.message;
-    btn.disabled=false;
+  } catch(err) {
+    statusBar.className = 'status-bar error';
+    statusText.textContent = err.message;
+    btn.disabled = false;
   }
 }
 
 // ── RESET ──
-function resetForm(){
-  document.querySelectorAll('.agent-card').forEach(c=>c.classList.remove('selected'));
-  document.getElementById('modeDisclosure').classList.remove('selected-disclosure','selected-condition');
-  document.getElementById('modeCondition').classList.remove('selected-disclosure','selected-condition');
-  selectedAgent=null; selectedMode=null; selectedFolderId=null; selectedFolderName=null;
-  document.getElementById('propAddress').value='';
-  document.getElementById('sellerName').value='';
-  document.getElementById('folderStatus').textContent='';
-  document.getElementById('driveFolderBtn').className='drive-btn';
-  document.getElementById('driveBtnText').textContent='Select Transaction Folder from Drive';
-  ['step3','step4'].forEach(id=>document.getElementById(id).classList.add('step-hidden'));
-  document.getElementById('confirmation').style.display='none';
-  document.getElementById('statusBar').className='status-bar';
-  document.getElementById('submitBtn').disabled=false;
-  window.scrollTo({top:0,behavior:'smooth'});
+function resetForm() {
+  document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('modeDisc').className = 'mode-card';
+  document.getElementById('modeCond').className = 'mode-card';
+  selectedAgent = null; selectedMode = null;
+  Object.keys(toggleState).forEach(k => {
+    toggleState[k] = 'no';
+    setToggle(k, 'no');
+  });
+  ['sellerLastName','propAddress','yearBuilt','reportEmail'].forEach(id => document.getElementById(id).value = '');
+  ['step3','step4','step5'].forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById('confirmation').style.display = 'none';
+  document.getElementById('statusBar').className = 'status-bar';
+  document.getElementById('submitBtn').disabled = false;
+  window.scrollTo({ top:0, behavior:'smooth' });
 }
 </script>
 </body>
