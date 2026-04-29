@@ -282,6 +282,12 @@ exports.handler = async (event) => {
     const activeFolder = activeFolders[0];
     console.log(`[SSPR] Found: ${activeFolder.name}`);
 
+    // ── Navigate to A5 (Smart Seller Protection Report folder) ───────────────
+    const a5Folders = await searchFolder(activeFolder.id, 'A5', token);
+    const a5FolderId = a5Folders.length ? a5Folders[0].id : null;
+    const a5FolderName = a5Folders.length ? a5Folders[0].name : null;
+    console.log('[SSPR] A5 folder: ' + (a5FolderName || 'NOT FOUND') + ' | ID: ' + (a5FolderId || 'none'));
+
     // ── Navigate to A2 or A3 ─────────────────────────────────────────────────
     const subFolders = await searchFolder(activeFolder.id, subfolderTarget, token);
     if (!subFolders.length) {
@@ -416,6 +422,7 @@ Be specific and thorough. Quote exact document language where relevant.`;
       brokerage_name:   brokerageName,
       folder_id:        clientFolder.id,
       folder_name:      clientFolder.name,
+      a5_folder_id:     a5FolderId,
       report_body:      reportBody,
       report_email:     reportEmail,
       files_read:       readFiles.length,
