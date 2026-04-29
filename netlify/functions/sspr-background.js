@@ -11,7 +11,8 @@
 const https = require('https');
 
 const ROOT_FOLDER_ID  = '1iuTI1fKo4IZps9hzXLPFoI3TUT3NaCKI'; // RE Transactions 2026
-const PER_FILE_CAP_KB = 6144;  // 6MB per file
+const PER_FILE_CAP_KB_DISCLOSURE = 6144;   // 6MB for disclosure docs
+const PER_FILE_CAP_KB_CONDITION  = 20480;  // 20MB for inspection reports
 const GROUP_SIZE      = 5;     // files per Claude call
 
 // ── Google Service Account Auth ───────────────────────────────────────────────
@@ -321,7 +322,8 @@ exports.handler = async (event) => {
       const sizeKB = Math.round(parseInt(file.size || 0) / 1024);
       if (sizeKB === 0) continue;
 
-      if (sizeKB > PER_FILE_CAP_KB) {
+      const fileCap = reportMode === "condition" ? PER_FILE_CAP_KB_CONDITION : PER_FILE_CAP_KB_DISCLOSURE;
+      if (sizeKB > fileCap) {
         inventoryFiles.push({ filename: file.name, sizeKB });
         console.log(`[SSPR] Too large, inventory only: ${file.name} (${sizeKB}KB)`);
         continue;
@@ -366,19 +368,28 @@ ${inventoryFiles.length ? `\nPresent by filename only (too large to attach):\n${
 ${otherNames.length ? `\nProcessed in other groups: ${otherNames.join(', ')}` : ''}
 ${conditionFlags}
 
-Read every attached document completely — every page, every section, every checkbox.
-Extract all relevant findings:
-- Document type and full execution status (signed/unsigned/initialed by whom)
-- Property address as it appears in the document
-- Party names exactly as written
-- All disclosures, known defects, conditions, hazard zones
-- Any vague, blank, or contradictory sections
-- Any flags a buyer's agent would challenge
+Read every attached document completely — every page, every section, every item.
 
-NHD: Quote exact checkbox language — only report zones marked YES or applicable.
-AVID: Label all findings as "agent observed" — these are not professional inspection findings.
+For PROFESSIONAL INSPECTION REPORTS (home inspection, pest report, roof inspection, structural, etc.):
+- These are the most critical documents — extract EVERY finding, defect, safety issue, and recommendation
+- Note inspector name, license, company, and inspection date
+- Note Section I vs Section II for pest reports with exact item descriptions
+- Extract all items the buyer could use in a repair request
+- Note any permit, warranty, or insurance documentation issues
+- Quote specific defect language from the report
 
-Be specific and thorough. Quote exact document language where relevant.`;
+For REPAIR REQUESTS (RFR):
+- Extract every line item requested by the buyer with exact language
+- Note which parties signed and when
+- Note agreed credits, completed repairs, or declined items
+
+For DISCLOSURE DOCS (TDS, SPQ, NHD, AVID, FIRPTA etc.):
+- Extract execution status and party names
+- Note any disclosed defects or unknown items marked
+- AVID findings: label as "agent observed" — these are visual observations, not professional inspection findings
+- NHD: quote exact checkbox language, only report zones marked YES or applicable
+
+Extract property address and party names exactly as written. Be specific and thorough. Quote exact document language where relevant.`;
 
       const result = await callClaude(group, groupPrompt);
       if (result.error) {
