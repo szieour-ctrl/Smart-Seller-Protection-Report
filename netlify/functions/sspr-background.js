@@ -13,6 +13,7 @@ const https = require('https');
 const ROOT_FOLDER_ID  = '1iuTI1fKo4IZps9hzXLPFoI3TUT3NaCKI'; // RE Transactions 2026
 const PER_FILE_CAP_KB_DISCLOSURE = 6144;   // 6MB for disclosure docs
 const PER_FILE_CAP_KB_CONDITION  = 20480;  // 20MB for inspection reports
+const LARGE_FILE_THRESHOLD_KB    = 3000;   // Files over 3MB get their own Claude call
 const GROUP_SIZE      = 5;     // files per Claude call
 
 // ── Google Service Account Auth ───────────────────────────────────────────────
@@ -339,11 +340,19 @@ exports.handler = async (event) => {
 
     console.log(`[SSPR] READ: ${readFiles.length} | INVENTORY: ${inventoryFiles.length}`);
 
-    // ── Batch through Claude ──────────────────────────────────────────────────
+    // ── Batch through Claude — smart grouping, large files get own call ─────────
     const groups = [];
-    for (let i = 0; i < readFiles.length; i += GROUP_SIZE) {
-      groups.push(readFiles.slice(i, i + GROUP_SIZE));
+    let currentGroup = [];
+    for (const file of readFiles) {
+      if (file.sizeKB >= LARGE_FILE_THRESHOLD_KB) {
+        if (currentGroup.length > 0) { groups.push(currentGroup); currentGroup = []; }
+        groups.push([file]); // Large file gets dedicated call
+      } else {
+        currentGroup.push(file);
+        if (currentGroup.length >= GROUP_SIZE) { groups.push(currentGroup); currentGroup = []; }
+      }
     }
+    if (currentGroup.length > 0) groups.push(currentGroup);
 
     const allFindings = [];
     const allFileNames = [
@@ -359,37 +368,46 @@ exports.handler = async (event) => {
       const invList  = inventoryFiles.map(f => `• ${f.filename} (${f.sizeKB}KB — too large, confirm by filename)`).join('\n');
       const otherNames = allFileNames.filter(n => !group.find(f => f.filename === n));
 
+      const isLargeInspectionGroup = group.length === 1 && group[0].sizeKB >= LARGE_FILE_THRESHOLD_KB;
+
       const groupPrompt =
 `DOCUMENT GROUP ${g + 1} OF ${groups.length} — READ EVERY ATTACHED PDF COMPLETELY
 
 Files attached in this group:
 ${group.map(f => `• ${f.filename} (${f.sizeKB}KB)`).join('\n')}
-${inventoryFiles.length ? `\nPresent by filename only (too large to attach):\n${invList}` : ''}
+${inventoryFiles.length ? `\nPresent by filename only (too large to read in isolation):\n${invList}` : ''}
 ${otherNames.length ? `\nProcessed in other groups: ${otherNames.join(', ')}` : ''}
 ${conditionFlags}
 
-Read every attached document completely — every page, every section, every item.
+${isLargeInspectionGroup ? `THIS IS A PROFESSIONAL INSPECTION REPORT — read every single page and extract every finding.
+Do not skip any section. Extract:
+- Inspector name, company, license number, and inspection date
+- Every defect, safety issue, and maintenance item found
+- Exact condition ratings and inspector recommendations
+- Any items requiring immediate attention vs future repair
+- All items a buyer would include in a repair request
+- Any permit, insurance, or warranty issues noted
+- Section I and Section II items if pest report
+Quote specific defect language directly from the report.` : `Read every attached document completely — every page, every section, every item.
 
-For PROFESSIONAL INSPECTION REPORTS (home inspection, pest report, roof inspection, structural, etc.):
-- These are the most critical documents — extract EVERY finding, defect, safety issue, and recommendation
-- Note inspector name, license, company, and inspection date
-- Note Section I vs Section II for pest reports with exact item descriptions
-- Extract all items the buyer could use in a repair request
-- Note any permit, warranty, or insurance documentation issues
+For PROFESSIONAL INSPECTION REPORTS (home, pest, roof, structural):
+- Extract EVERY finding, defect, safety issue, and recommendation
+- Note inspector name, license, company, and date
+- Note Section I vs Section II for pest reports
 - Quote specific defect language from the report
 
 For REPAIR REQUESTS (RFR):
-- Extract every line item requested by the buyer with exact language
+- Extract every line item with exact buyer language
 - Note which parties signed and when
-- Note agreed credits, completed repairs, or declined items
+- Note agreed credits, repairs, or declined items
 
-For DISCLOSURE DOCS (TDS, SPQ, NHD, AVID, FIRPTA etc.):
+For DISCLOSURE DOCS (TDS, SPQ, NHD, AVID, FIRPTA):
 - Extract execution status and party names
-- Note any disclosed defects or unknown items marked
-- AVID findings: label as "agent observed" — these are visual observations, not professional inspection findings
-- NHD: quote exact checkbox language, only report zones marked YES or applicable
+- Note any disclosed defects or unknown items
+- AVID: label all findings as "agent observed" — not professional inspection findings
+- NHD: quote exact checkbox language, only report zones marked YES`}
 
-Extract property address and party names exactly as written. Be specific and thorough. Quote exact document language where relevant.`;
+Be specific and thorough. Quote exact document language where relevant.`;
 
       const result = await callClaude(group, groupPrompt);
       if (result.error) {
